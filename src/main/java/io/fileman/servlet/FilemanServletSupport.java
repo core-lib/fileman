@@ -75,6 +75,7 @@ public class FilemanServletSupport implements Servlet, Filter {
     public void service(ServletRequest req, ServletResponse res) throws IOException {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
+        String contextPath = request.getContextPath();
         String requestPath = request.getRequestURI();
         String servletPath = request.getServletPath();
         String filemanPath = requestPath.substring(servletPath.length());
@@ -86,7 +87,7 @@ public class FilemanServletSupport implements Servlet, Filter {
         }
         // 是目录
         else if (file.isDirectory()) {
-            Configuration configuration = new ServletConfiguration(servletConfig);
+            Configuration configuration = new ServletConfiguration(contextPath + servletPath, servletConfig);
             File root = new File(this.root);
             Fileman fileman = new Fileman();
             fileman.setPath(servletPath + filemanPath);

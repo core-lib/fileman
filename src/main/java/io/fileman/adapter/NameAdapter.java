@@ -24,7 +24,9 @@ public class NameAdapter extends Adapter {
         File root = action.getRoot();
         File file = action.getFile();
         String path = file.getPath().substring(root.getPath().length()).replace(File.separator, "/");
-        return "<a href=\"" + path + "\">" + name + "</a>";
+        String context = action.getConfiguration().context();
+        String URI = (context + "/" + path).replaceAll("/+", "/");
+        return "<a href=\"" + URI + "\">" + name + "</a>";
     }
 
     @Override

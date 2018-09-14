@@ -11,6 +11,11 @@ import java.util.Enumeration;
 public interface Configuration {
 
     /**
+     * @return 基础路径
+     */
+    String context();
+
+    /**
      * @return 所有配置项的名称
      */
     Enumeration<String> names();

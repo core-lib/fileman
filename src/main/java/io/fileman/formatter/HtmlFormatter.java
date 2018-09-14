@@ -30,6 +30,7 @@ public class HtmlFormatter implements Formatter {
         OutputStreamWriter osw = new OutputStreamWriter(out);
         PrintWriter pw = new PrintWriter(osw);
         String path = Filemans.ifEmpty(fileman.getPath(), "/");
+
         pw.println("<html>");
         pw.println("<head>");
         pw.println("    <title>Index of " + path + "</title>");
@@ -48,7 +49,7 @@ public class HtmlFormatter implements Formatter {
         pw.println("    </thead>");
         pw.println("    <tr>");
         pw.println("        <td>");
-        
+
         pw.println("            <a href=\"\">Parent Directory</a>");
         pw.println("        </td>");
         List<Fileman> children = fileman.getChildren();
