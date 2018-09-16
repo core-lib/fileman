@@ -48,11 +48,7 @@ public class HtmlFormatter implements Formatter {
         pw.println("    </thead>");
         pw.println("    <tr>");
         pw.println("        <td>");
-        String uri = fileman.getUri();
-        String[] parts = uri.split("/");
-        StringBuilder parent = new StringBuilder();
-        for (int i = 0; i < parts.length - 1; i++) if (!parts[i].isEmpty()) parent.append("/").append(parts[i]);
-        pw.println("            <a href=\"" + parent + "\">Parent Directory</a>");
+        pw.println("            <a href=\"../\">Parent Directory</a>");
         pw.println("        </td>");
         List<Fileman> children = fileman.getChildren();
         for (Fileman child : children) {

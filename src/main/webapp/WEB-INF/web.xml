@@ -10,7 +10,7 @@
         <servlet-class>io.fileman.servlet.FilemanServletSupport</servlet-class>
         <init-param>
             <param-name>root</param-name>
-            <param-value>D:/</param-value>
+            <param-value>D:</param-value>
         </init-param>
         <init-param>
             <param-name>fields</param-name>
@@ -24,7 +24,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>fileman</servlet-name>
-        <url-pattern>/fileman/*</url-pattern>
+        <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
 </web-app>

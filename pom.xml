@@ -63,7 +63,7 @@
                     <username>admin</username>
                     <password>admin</password>
                     <uriEncoding>UTF-8</uriEncoding>
-                    <path>/context</path>
+                    <path>/</path>
                 </configuration>
             </plugin>
             <plugin>
