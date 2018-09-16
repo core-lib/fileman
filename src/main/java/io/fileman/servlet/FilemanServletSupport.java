@@ -75,10 +75,10 @@ public class FilemanServletSupport implements Servlet, Filter {
     public void service(ServletRequest req, ServletResponse res) throws IOException {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
-        String contextPath = request.getContextPath();
         String requestPath = request.getRequestURI();
+        String contextPath = request.getContextPath();
         String servletPath = request.getServletPath();
-        String filemanPath = requestPath.substring(servletPath.length());
+        String filemanPath = requestPath.substring(contextPath.length() + servletPath.length());
         while (filemanPath.endsWith("/")) filemanPath = filemanPath.substring(0, filemanPath.length() - 1);
         filemanPath = URLDecoder.decode(filemanPath, "UTF-8");
         File file = new File(root, filemanPath);
