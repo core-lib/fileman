@@ -10,7 +10,15 @@
         <servlet-class>io.fileman.servlet.FilemanServletSupport</servlet-class>
         <init-param>
             <param-name>root</param-name>
-            <param-value>D:</param-value>
+            <param-value>E:\迅雷下载</param-value>
+        </init-param>
+        <init-param>
+            <param-name>synthesizer</param-name>
+            <param-value>io.fileman.RenderingSynthesizer</param-value>
+        </init-param>
+        <init-param>
+            <param-name>formatter</param-name>
+            <param-value>io.fileman.formatter.HtmlFormatter</param-value>
         </init-param>
         <init-param>
             <param-name>fields</param-name>

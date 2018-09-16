@@ -24,4 +24,12 @@ public abstract class Filemans {
         return value == null || value.trim().isEmpty() ? defaultValue : value;
     }
 
+    public static <T> T newInstance(String className) {
+        try {
+            return (T) Class.forName(className).newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

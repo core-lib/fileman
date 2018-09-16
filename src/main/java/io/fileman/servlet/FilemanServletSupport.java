@@ -28,15 +28,16 @@ public class FilemanServletSupport implements Servlet, Filter {
     private ServletConfig servletConfig;
     private String root;
     private List<Converter> converters = new ArrayList<Converter>();
-    private Synthesizer synthesizer = new RenderingSynthesizer();
-    private Formatter formatter = new HtmlFormatter();
+    private Synthesizer synthesizer;
+    private Formatter formatter;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         try {
             servletConfig = config;
             root = Filemans.ifBlank(config.getInitParameter("root"), System.getProperty("user.dir"));
-
+            synthesizer = Filemans.newInstance(Filemans.ifBlank(config.getInitParameter("synthesizer"), RenderingSynthesizer.class.getName()));
+            formatter = Filemans.newInstance(Filemans.ifBlank(config.getInitParameter("formatter"), HtmlFormatter.class.getName()));
             String fields = config.getInitParameter("fields");
             String[] columns = fields.split("[,\\s\r\n]+");
             Collection<Resource> resources = SimpleDetector.Builder
