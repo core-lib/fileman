@@ -12,17 +12,10 @@ import java.util.Enumeration;
  * 2018/9/14
  */
 public class ServletConfiguration implements Configuration {
-    private final String path;
     private final ServletConfig servletConfig;
 
-    public ServletConfiguration(String path, ServletConfig servletConfig) {
-        this.path = path;
+    public ServletConfiguration(ServletConfig servletConfig) {
         this.servletConfig = servletConfig;
-    }
-
-    @Override
-    public String context() {
-        return path;
     }
 
     @Override

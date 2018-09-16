@@ -1,5 +1,7 @@
 package io.fileman;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.List;
 
@@ -12,8 +14,8 @@ import java.util.List;
 public class Synthesization<T extends Converter> extends Action {
     private final List<T> converters;
 
-    public Synthesization(Configuration configuration, File root, File file, List<T> converters) {
-        super(configuration, root, file);
+    public Synthesization(Configuration configuration, HttpServletRequest request, HttpServletResponse response, File root, File file, List<T> converters) {
+        super(configuration, request, response, root, file);
         this.converters = converters;
     }
 

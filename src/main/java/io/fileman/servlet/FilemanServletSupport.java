@@ -14,8 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URLDecoder;
 import java.util.*;
 
 /**
@@ -80,6 +80,7 @@ public class FilemanServletSupport implements Servlet, Filter {
         String servletPath = request.getServletPath();
         String filemanPath = requestPath.substring(servletPath.length());
         while (filemanPath.endsWith("/")) filemanPath = filemanPath.substring(0, filemanPath.length() - 1);
+        filemanPath = URLDecoder.decode(filemanPath, "UTF-8");
         File file = new File(root, filemanPath);
         // 文件不存在
         if (!file.exists()) {
@@ -87,32 +88,30 @@ public class FilemanServletSupport implements Servlet, Filter {
         }
         // 是目录
         else if (file.isDirectory()) {
-            Configuration configuration = new ServletConfiguration(contextPath + servletPath, servletConfig);
+            Configuration configuration = new ServletConfiguration(servletConfig);
             File root = new File(this.root);
             Fileman fileman = new Fileman();
-            fileman.setPath(servletPath + filemanPath);
+            fileman.setUri((contextPath + "/" + servletPath + "/" + filemanPath).replaceAll("/+", "/"));
+            fileman.setPath(filemanPath);
             fileman.setFolder(true);
             fileman.setChildren(new ArrayList<Fileman>());
             File[] files = file.listFiles();
             for (int i = 0; files != null && i < files.length; i++) {
                 File sub = files[i];
                 Fileman child = new Fileman();
-                child.setPath(servletPath + filemanPath + "/" + sub.getName());
+                child.setUri((contextPath + "/" + servletPath + "/" + filemanPath + "/" + sub.getName()).replaceAll("/+", "/"));
+                child.setPath(filemanPath + "/" + sub.getName());
                 child.setFolder(sub.isDirectory());
-                Synthesization<Converter> synthesization = new Synthesization<Converter>(configuration, root, sub, converters);
+                Synthesization<Converter> synthesization = new Synthesization<Converter>(configuration, request, response, root, sub, converters);
                 Map<String, Object> properties = synthesizer.synthesize(synthesization);
                 child.setProperties(properties);
                 fileman.getChildren().add(child);
             }
-            Synthesization<Converter> synthesization = new Synthesization<Converter>(configuration, root, file, converters);
+            Synthesization<Converter> synthesization = new Synthesization<Converter>(configuration, request, response, root, file, converters);
             Map<String, Object> properties = synthesizer.synthesize(synthesization);
             fileman.setProperties(properties);
 
-            String contentType = formatter.getContentType();
-            response.setContentType(contentType);
-            OutputStream out = response.getOutputStream();
-            formatter.format(fileman, out);
-            out.flush();
+            formatter.format(fileman, request, response);
         }
         // 是文件
         else if (file.isFile()) {

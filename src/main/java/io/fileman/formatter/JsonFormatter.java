@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import io.fileman.Fileman;
 import io.fileman.Formatter;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -18,12 +20,9 @@ public class JsonFormatter implements Formatter {
     private final ObjectWriter writer = new ObjectMapper().writerWithDefaultPrettyPrinter();
 
     @Override
-    public String getContentType() {
-        return "application/json";
-    }
-
-    @Override
-    public void format(Fileman fileman, OutputStream out) throws IOException {
+    public void format(Fileman fileman, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        OutputStream out = response.getOutputStream();
         writer.writeValue(out, fileman);
     }
 

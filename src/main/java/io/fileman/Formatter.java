@@ -1,7 +1,8 @@
 package io.fileman;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * 格式化器
@@ -12,16 +13,12 @@ import java.io.OutputStream;
 public interface Formatter {
 
     /**
-     * @return 内容类型
-     */
-    String getContentType();
-
-    /**
      * 格式化输出
      *
-     * @param fileman 文件目录
-     * @param out     输出流
+     * @param fileman  文件目录
+     * @param request  请求
+     * @param response 回应
      */
-    void format(Fileman fileman, OutputStream out) throws IOException;
+    void format(Fileman fileman, HttpServletRequest request, HttpServletResponse response) throws IOException;
 
 }

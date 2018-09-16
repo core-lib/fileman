@@ -10,10 +10,19 @@ import java.util.Map;
  * 2018/9/14
  */
 public class Fileman {
+    private String uri;
     private String path;
     private boolean folder;
     private Map<String, Object> properties;
     private List<Fileman> children;
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
 
     public String getPath() {
         return path;

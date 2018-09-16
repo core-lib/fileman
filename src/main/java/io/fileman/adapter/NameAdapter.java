@@ -3,6 +3,7 @@ package io.fileman.adapter;
 import io.fileman.Action;
 import io.fileman.Adapter;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 
 /**
@@ -21,11 +22,13 @@ public class NameAdapter extends Adapter {
     @Override
     public Object render(Action action) {
         Object name = resolve(action);
+        HttpServletRequest request = action.getRequest();
+        String contextPath = request.getContextPath();
+        String servletPath = request.getServletPath();
         File root = action.getRoot();
         File file = action.getFile();
         String path = file.getPath().substring(root.getPath().length()).replace(File.separator, "/");
-        String context = action.getConfiguration().context();
-        String URI = (context + "/" + path).replaceAll("/+", "/");
+        String URI = (contextPath + "/" + servletPath + "/" + path).replaceAll("/+", "/");
         return "<a href=\"" + URI + "\">" + name + "</a>";
     }
 

@@ -10,7 +10,7 @@
         <servlet-class>io.fileman.servlet.FilemanServletSupport</servlet-class>
         <init-param>
             <param-name>root</param-name>
-            <param-value>D:/logs</param-value>
+            <param-value>D:/</param-value>
         </init-param>
         <init-param>
             <param-name>fields</param-name>
