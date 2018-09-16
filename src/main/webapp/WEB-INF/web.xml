@@ -15,10 +15,7 @@
         <init-param>
             <param-name>fields</param-name>
             <param-value>
-                name
-                size
-                last-modified
-                children-count
+                name, size, time, type
             </param-value>
         </init-param>
     </servlet>

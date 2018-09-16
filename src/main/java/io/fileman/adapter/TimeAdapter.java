@@ -13,16 +13,16 @@ import java.util.Date;
  * @author 杨昌沛 646742615@qq.com
  * 2018/9/14
  */
-public class LastModifiedAdapter extends Adapter {
+public class TimeAdapter extends Adapter {
 
     @Override
     public String name() {
-        return "Last-Modified";
+        return "Time";
     }
 
     @Override
     public String key() {
-        return "lastModified";
+        return "time";
     }
 
     @Override

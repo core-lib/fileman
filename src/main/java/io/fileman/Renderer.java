@@ -1,5 +1,7 @@
 package io.fileman;
 
+import java.io.IOException;
+
 /**
  * 文件信息渲染器
  *
@@ -18,7 +20,8 @@ public interface Renderer extends Converter {
      *
      * @param action 渲染动作
      * @return 渲染结果
+     * @throws IOException I/O 异常
      */
-    Object render(Action action);
+    Object render(Action action) throws IOException;
 
 }

@@ -1,5 +1,6 @@
 package io.fileman;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -15,7 +16,8 @@ public interface Synthesizer<T extends Converter> {
      *
      * @param synthesization 合成动作
      * @return 文件信息
+     * @throws IOException I/O 异常
      */
-    Map<String, Object> synthesize(Synthesization<T> synthesization);
+    Map<String, Object> synthesize(Synthesization<T> synthesization) throws IOException;
 
 }

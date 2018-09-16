@@ -1,5 +1,6 @@
 package io.fileman;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,7 @@ import java.util.Map;
 public class RenderingSynthesizer implements Synthesizer<Renderer> {
 
     @Override
-    public Map<String, Object> synthesize(Synthesization<Renderer> synthesization) {
+    public Map<String, Object> synthesize(Synthesization<Renderer> synthesization) throws IOException {
         Map<String, Object> properties = new LinkedHashMap<String, Object>();
         List<Renderer> renderers = synthesization.getConverters();
         for (Renderer renderer : renderers) {
