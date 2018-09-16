@@ -27,8 +27,8 @@ public class NameAdapter extends Adapter {
         String servletPath = request.getServletPath();
         File root = action.getRoot();
         File file = action.getFile();
-        String path = file.getPath().substring(root.getPath().length()).replace(File.separator, "/");
-        String URI = (contextPath + "/" + servletPath + "/" + path).replaceAll("/+", "/");
+        String filemanPath = root.toURI().relativize(file.toURI()).toString();
+        String URI = ("/" + contextPath + "/" + servletPath + "/" + filemanPath).replaceAll("/+", "/");
         return "<a href=\"" + URI + "\">" + name + "</a>";
     }
 

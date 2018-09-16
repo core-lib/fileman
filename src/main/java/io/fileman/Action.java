@@ -62,6 +62,6 @@ public class Action {
 
     @Override
     public String toString() {
-        return file.getAbsolutePath().substring(root.getAbsolutePath().length());
+        return "/" + root.toURI().relativize(file.toURI()).toString();
     }
 }

@@ -91,7 +91,7 @@ public class FilemanServletSupport implements Servlet, Filter {
             Configuration configuration = new ServletConfiguration(servletConfig);
             File root = new File(this.root);
             Fileman fileman = new Fileman();
-            fileman.setUri((contextPath + "/" + servletPath + "/" + filemanPath).replaceAll("/+", "/"));
+            fileman.setUri(("/" + contextPath + "/" + servletPath + "/" + filemanPath).replaceAll("/+", "/"));
             fileman.setPath(filemanPath);
             fileman.setFolder(true);
             fileman.setChildren(new ArrayList<Fileman>());
@@ -99,7 +99,7 @@ public class FilemanServletSupport implements Servlet, Filter {
             for (int i = 0; files != null && i < files.length; i++) {
                 File sub = files[i];
                 Fileman child = new Fileman();
-                child.setUri((contextPath + "/" + servletPath + "/" + filemanPath + "/" + sub.getName()).replaceAll("/+", "/"));
+                child.setUri(("/" + contextPath + "/" + servletPath + "/" + filemanPath + "/" + sub.getName()).replaceAll("/+", "/"));
                 child.setPath(filemanPath + "/" + sub.getName());
                 child.setFolder(sub.isDirectory());
                 Synthesization<Converter> synthesization = new Synthesization<Converter>(configuration, request, response, root, sub, converters);
