@@ -1,5 +1,8 @@
 package io.fileman;
 
+import java.io.Closeable;
+import java.io.IOException;
+
 /**
  * 文件管理器工具类
  *
@@ -10,6 +13,18 @@ public abstract class Filemans {
 
     private Filemans() {
         throw new UnsupportedOperationException();
+    }
+
+    public static boolean isNull(Object value) {
+        return value == null;
+    }
+
+    public static boolean isEmpty(String value) {
+        return isNull(value) || value.isEmpty();
+    }
+
+    public static boolean isBlank(String value) {
+        return isEmpty(value) || value.trim().isEmpty();
     }
 
     public static <T> T ifNull(T value, T defaultValue) {
@@ -32,4 +47,12 @@ public abstract class Filemans {
         }
     }
 
+    public static void close(Closeable closeable) {
+        if (closeable == null) return;
+        try {
+            closeable.close();
+        } catch (IOException e) {
+            // nothing to do...
+        }
+    }
 }

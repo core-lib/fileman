@@ -9,11 +9,13 @@ import io.fileman.formatter.HtmlFormatter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -25,9 +27,11 @@ import java.util.*;
 public class FilemanWebSupport {
     protected Configuration configuration;
     protected String root;
-    protected List<Converter> converters = new ArrayList<>();
     protected Synthesizer<Converter> synthesizer;
     protected Formatter formatter;
+    protected int buffer;
+    protected List<Converter> converters = new ArrayList<>();
+    protected List<Extractor> extractors = new ArrayList<>();
 
     protected void init(Configuration configuration) throws ServletException {
         try {
@@ -35,6 +39,7 @@ public class FilemanWebSupport {
             root = Filemans.ifBlank(configuration.valueOf("root"), System.getProperty("user.dir"));
             synthesizer = Filemans.newInstance(Filemans.ifBlank(configuration.valueOf("synthesizer"), RenderSynthesizer.class.getName()));
             formatter = Filemans.newInstance(Filemans.ifBlank(configuration.valueOf("formatter"), HtmlFormatter.class.getName()));
+            buffer = Integer.valueOf(Filemans.ifBlank(configuration.valueOf("buffer"), "" + 1024 * 8));
             String fields = configuration.valueOf("fields");
             String[] columns = fields.split("[,\\s\r\n]+");
             Collection<Resource> resources = SimpleDetector.Builder
@@ -59,12 +64,40 @@ public class FilemanWebSupport {
                     throw new ServletException("unknown field " + column);
                 }
             }
+
         } catch (IOException e) {
             throw new ServletException(e);
         }
     }
 
     protected void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String method = request.getMethod().toUpperCase();
+        switch (method) {
+            case "GET":
+                get(request, response);
+                break;
+            case "POST":
+                get(request, response);
+                break;
+            case "PUT":
+                get(request, response);
+                break;
+            case "DELETE":
+                get(request, response);
+                break;
+            case "OPTIONS":
+                get(request, response);
+                break;
+            case "TRACE":
+                get(request, response);
+                break;
+            default:
+                extend(method, request, response);
+                break;
+        }
+    }
+
+    protected void get(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String requestPath = request.getRequestURI();
         String contextPath = request.getContextPath();
         String servletPath = request.getServletPath();
@@ -104,12 +137,65 @@ public class FilemanWebSupport {
         }
         // 是文件
         else if (file.isFile()) {
+            String range = request.getHeader("Range");
+            // 全部读取
+            if (Filemans.isBlank(range)) {
+                Path path = Paths.get(file.toURI());
+                String contentType = Files.probeContentType(path);
+                if (contentType == null) contentType = "application/octet-stream";
+                response.setContentType(contentType);
 
+                String name = file.getName();
+                String contentDisposition = "attachment; filename=\"" + URLEncoder.encode(name, "UTF-8") + "\"";
+                response.setHeader("Content-Disposition", contentDisposition);
+
+                OutputStream out = response.getOutputStream();
+                InputStream in = null;
+                try {
+                    in = new FileInputStream(file);
+                    byte[] buf = new byte[buffer];
+                    int len;
+                    while ((len = in.read(buf)) != -1) out.write(buf, 0, len);
+                } finally {
+                    Filemans.close(in);
+                }
+            }
+            // 部分读取
+            else {
+                Range r = Range.valueOf(range);
+                Extractor extractor = null;
+                for (Extractor e : extractors) if (e.supports(file, r)) extractor = e;
+                if (extractor == null) response.sendError(HttpURLConnection.HTTP_NOT_IMPLEMENTED, "Not Implemented");
+                else extractor.extract(file, r, new ExtractContext(new File(root), configuration, request, response));
+            }
         }
         // 不认识
         else {
             response.sendError(HttpURLConnection.HTTP_NOT_FOUND, "Not Found");
         }
+    }
+
+    protected void post(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    }
+
+    protected void put(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+    }
+
+    protected void delete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+    }
+
+    protected void options(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+    }
+
+    protected void trace(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+    }
+
+    protected void extend(String method, HttpServletRequest request, HttpServletResponse response) throws IOException {
+
     }
 
     protected void destroy() {
