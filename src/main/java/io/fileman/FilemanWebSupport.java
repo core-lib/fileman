@@ -1,14 +1,12 @@
-package io.fileman.servlet;
+package io.fileman;
 
 import io.detector.Filter;
 import io.detector.FilterChain;
 import io.detector.Resource;
 import io.detector.SimpleDetector;
-import io.fileman.*;
-import io.fileman.Formatter;
 import io.fileman.formatter.HtmlFormatter;
 
-import javax.servlet.*;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -19,33 +17,32 @@ import java.net.URLDecoder;
 import java.util.*;
 
 /**
- * 文件管理器Servlet集成
+ * 文件管理器WEB集成
  *
  * @author 杨昌沛 646742615@qq.com
  * 2018/9/14
  */
-public class FilemanServletSupport implements Servlet, Filter {
-    private ServletConfig servletConfig;
-    private String root;
-    private List<Converter> converters = new ArrayList<>();
-    private Synthesizer<Converter> synthesizer;
-    private Formatter formatter;
+public class FilemanWebSupport {
+    protected Configuration configuration;
+    protected String root;
+    protected List<Converter> converters = new ArrayList<>();
+    protected Synthesizer<Converter> synthesizer;
+    protected Formatter formatter;
 
-    @Override
-    public void init(ServletConfig config) throws ServletException {
+    protected void init(Configuration configuration) throws ServletException {
         try {
-            servletConfig = config;
-            root = Filemans.ifBlank(config.getInitParameter("root"), System.getProperty("user.dir"));
-            synthesizer = Filemans.newInstance(Filemans.ifBlank(config.getInitParameter("synthesizer"), RenderSynthesizer.class.getName()));
-            formatter = Filemans.newInstance(Filemans.ifBlank(config.getInitParameter("formatter"), HtmlFormatter.class.getName()));
-            String fields = config.getInitParameter("fields");
+            this.configuration = configuration;
+            root = Filemans.ifBlank(configuration.valueOf("root"), System.getProperty("user.dir"));
+            synthesizer = Filemans.newInstance(Filemans.ifBlank(configuration.valueOf("synthesizer"), RenderSynthesizer.class.getName()));
+            formatter = Filemans.newInstance(Filemans.ifBlank(configuration.valueOf("formatter"), HtmlFormatter.class.getName()));
+            String fields = configuration.valueOf("fields");
             String[] columns = fields.split("[,\\s\r\n]+");
             Collection<Resource> resources = SimpleDetector.Builder
                     .scan("fileman")
                     .includeJar()
                     .recursively()
                     .build()
-                    .detect(this);
+                    .detect(new ConfigFilter());
             Properties properties = new Properties();
             for (Resource resource : resources) {
                 InputStream in = resource.getInputStream();
@@ -67,15 +64,7 @@ public class FilemanServletSupport implements Servlet, Filter {
         }
     }
 
-    @Override
-    public ServletConfig getServletConfig() {
-        return servletConfig;
-    }
-
-    @Override
-    public void service(ServletRequest req, ServletResponse res) throws IOException {
-        HttpServletRequest request = (HttpServletRequest) req;
-        HttpServletResponse response = (HttpServletResponse) res;
+    protected void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String requestPath = request.getRequestURI();
         String contextPath = request.getContextPath();
         String servletPath = request.getServletPath();
@@ -89,7 +78,6 @@ public class FilemanServletSupport implements Servlet, Filter {
         }
         // 是目录
         else if (file.isDirectory()) {
-            Configuration configuration = new ServletConfiguration(servletConfig);
             File root = new File(this.root);
             Fileman fileman = new Fileman();
             fileman.setUri(("/" + contextPath + "/" + servletPath + "/" + filemanPath).replaceAll("/+", "/"));
@@ -124,19 +112,19 @@ public class FilemanServletSupport implements Servlet, Filter {
         }
     }
 
-    @Override
-    public String getServletInfo() {
-        return servletConfig.getServletName();
+    protected void destroy() {
+        this.configuration = null;
+        this.root = null;
+        this.converters.clear();
+        this.converters = null;
+        this.synthesizer = null;
+        this.formatter = null;
     }
 
-    @Override
-    public void destroy() {
-        servletConfig = null;
-        root = null;
-    }
-
-    @Override
-    public boolean accept(Resource resource, FilterChain filterChain) {
-        return resource.getName().endsWith(".properties") && filterChain.doNext(resource);
+    static class ConfigFilter implements Filter {
+        @Override
+        public boolean accept(Resource resource, FilterChain chain) {
+            return resource.getName().endsWith(".properties") && chain.doNext(resource);
+        }
     }
 }

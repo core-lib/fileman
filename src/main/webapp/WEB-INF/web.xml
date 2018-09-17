@@ -7,10 +7,10 @@
 
     <servlet>
         <servlet-name>fileman</servlet-name>
-        <servlet-class>io.fileman.servlet.FilemanServletSupport</servlet-class>
+        <servlet-class>io.fileman.FilemanServletSupport</servlet-class>
         <init-param>
             <param-name>root</param-name>
-            <param-value>E:\迅雷下载</param-value>
+            <param-value>D:\</param-value>
         </init-param>
         <init-param>
             <param-name>synthesizer</param-name>

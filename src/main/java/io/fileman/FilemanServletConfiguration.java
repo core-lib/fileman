@@ -1,6 +1,4 @@
-package io.fileman.servlet;
-
-import io.fileman.Configuration;
+package io.fileman;
 
 import javax.servlet.ServletConfig;
 import java.util.Enumeration;
@@ -11,10 +9,10 @@ import java.util.Enumeration;
  * @author 杨昌沛 646742615@qq.com
  * 2018/9/14
  */
-public class ServletConfiguration implements Configuration {
+public class FilemanServletConfiguration implements Configuration {
     private final ServletConfig servletConfig;
 
-    ServletConfiguration(ServletConfig servletConfig) {
+    FilemanServletConfiguration(ServletConfig servletConfig) {
         this.servletConfig = servletConfig;
     }
 
