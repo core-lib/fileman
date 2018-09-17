@@ -28,16 +28,18 @@ public class BytesExtractor implements Extractor {
             long start = range.getStart();
             long end = range.getEnd() > 0 ? range.getEnd() : Long.MAX_VALUE;
             long total = raf.length();
-            long length = Math.min(end, total - 1) - start;
+            long first = start > 0 ? start : 0;
+            long last = Math.min(end, total - 1);
+            long length = last - first;
             HttpServletResponse response = context.getResponse();
             if (length <= 0) {
                 response.sendError(HttpURLConnection.HTTP_NO_CONTENT, "No Content");
                 return;
             }
             response.setStatus(HttpURLConnection.HTTP_PARTIAL);
-            response.setHeader("Content-Range", "bytes " + start + "-" + Math.min(end, total - 1) + "/" + total);
+            response.setHeader("Content-Range", "bytes " + first + "-" + last + "/" + total);
             OutputStream out = response.getOutputStream();
-            raf.seek(start);
+            raf.seek(first);
             byte[] buf = new byte[1024 * 8];
             while (length > 0) {
                 int len = raf.read(buf, 0, (int) Math.min(buf.length, length));
