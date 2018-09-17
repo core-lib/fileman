@@ -23,7 +23,7 @@
         <init-param>
             <param-name>fields</param-name>
             <param-value>
-                name, size, time, type
+                name, size, time, type, etag
             </param-value>
         </init-param>
     </servlet>
