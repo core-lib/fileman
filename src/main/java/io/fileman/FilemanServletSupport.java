@@ -15,9 +15,9 @@ public class FilemanServletSupport extends FilemanWebSupport implements Servlet 
     private ServletConfig servletConfig;
 
     @Override
-    public void init(ServletConfig config) throws ServletException {
-        this.servletConfig = config;
-        super.init(new FilemanServletConfiguration(config));
+    public void init(ServletConfig servletConfig) throws ServletException {
+        this.servletConfig = servletConfig;
+        super.init(new FilemanServletConfiguration(servletConfig));
     }
 
     @Override
