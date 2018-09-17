@@ -1,6 +1,7 @@
 package io.fileman;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -67,4 +68,24 @@ public abstract class Filemans {
         }
         return joined.toString();
     }
+
+    public static String quote(String value) {
+        return value.startsWith("\"") && value.endsWith("\"") ? value : "\"" + value + "\"";
+    }
+
+    public static String unquote(String value) {
+        return value.startsWith("\"") && value.endsWith("\"") ? value.substring(1, value.length() - 1) : value;
+    }
+
+    public static boolean delete(File file) {
+        if (!file.exists()) return true;
+        if (file.isFile()) return file.delete();
+        File[] files = file.listFiles();
+        boolean deleted = true;
+        for (int i = 0; files != null && i < files.length; i++) {
+            deleted = deleted && delete(files[i]);
+        }
+        return file.delete() && deleted;
+    }
+
 }

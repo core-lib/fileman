@@ -9,6 +9,7 @@ import io.fileman.formatter.HtmlFormatter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URLDecoder;
@@ -99,26 +100,26 @@ public class FilemanWebSupport {
         }
     }
 
-    protected void handle(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void handle(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String method = request.getMethod().toUpperCase();
         switch (method) {
             case "GET":
                 get(request, response);
                 break;
             case "POST":
-                get(request, response);
+                post(request, response);
                 break;
             case "PUT":
-                get(request, response);
+                put(request, response);
                 break;
             case "DELETE":
-                get(request, response);
+                delete(request, response);
                 break;
             case "OPTIONS":
-                get(request, response);
+                options(request, response);
                 break;
             case "TRACE":
-                get(request, response);
+                trace(request, response);
                 break;
             default:
                 extend(method, request, response);
@@ -205,15 +206,84 @@ public class FilemanWebSupport {
         }
     }
 
-    protected void post(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void post(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        String requestPath = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        String servletPath = request.getServletPath();
+        String filemanPath = requestPath.substring(contextPath.length() + servletPath.length());
+        while (filemanPath.endsWith("/")) filemanPath = filemanPath.substring(0, filemanPath.length() - 1);
+        filemanPath = URLDecoder.decode(filemanPath, "UTF-8");
+        File file = new File(root, filemanPath);
+        Collection<Part> parts = request.getParts();
+        // 如果没有文件则返回
+        if (parts.isEmpty()) {
+            return;
+        }
+        // 如果文件夹不存在则创建
+        if (!file.exists() && !file.mkdirs()) {
+            response.sendError(HttpURLConnection.HTTP_BAD_REQUEST, "Bad Request");
+            return;
+        }
+        // 如果当前路径不是一个文件夹则冲突
+        if (!file.isDirectory()) {
+            response.sendError(HttpURLConnection.HTTP_CONFLICT, "Conflict");
+            return;
+        }
+        // 将文件写入该文件夹
+        for (Part part : parts) {
+            String disposition = part.getHeader("Content-Disposition");
+            String[] segments = disposition.split("\\s*;\\s*");
+            String filename = UUID.randomUUID().toString();
+            for (String segment : segments) {
+                String[] keyValue = segment.split("\\s*=\\s*");
+                if (!"filename".equals(keyValue[0])) continue;
+                filename = Filemans.unquote(keyValue[1]);
+            }
+            part.write(new File(file, filename).getPath());
+        }
+        response.setStatus(HttpURLConnection.HTTP_CREATED);
     }
 
-    protected void put(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+    protected void put(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        String requestPath = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        String servletPath = request.getServletPath();
+        String filemanPath = requestPath.substring(contextPath.length() + servletPath.length());
+        while (filemanPath.endsWith("/")) filemanPath = filemanPath.substring(0, filemanPath.length() - 1);
+        filemanPath = URLDecoder.decode(filemanPath, "UTF-8");
+        File file = new File(root, filemanPath);
+        Collection<Part> parts = request.getParts();
+        // 如果没有文件则返回
+        if (parts.isEmpty()) {
+            return;
+        }
+        // 如果所在目录不存在则创建
+        File parent = file.getParentFile();
+        if (!parent.exists() && !parent.mkdirs()) {
+            response.sendError(HttpURLConnection.HTTP_BAD_REQUEST, "Bad Request");
+            return;
+        }
+        // 如果当前路径是一个文件夹则冲突
+        if (file.isDirectory()) {
+            response.sendError(HttpURLConnection.HTTP_CONFLICT, "Conflict");
+            return;
+        }
+        Part part = parts.iterator().next();
+        part.write(file.getPath());
+        response.setStatus(HttpURLConnection.HTTP_NO_CONTENT);
     }
 
     protected void delete(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+        String requestPath = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        String servletPath = request.getServletPath();
+        String filemanPath = requestPath.substring(contextPath.length() + servletPath.length());
+        while (filemanPath.endsWith("/")) filemanPath = filemanPath.substring(0, filemanPath.length() - 1);
+        filemanPath = URLDecoder.decode(filemanPath, "UTF-8");
+        File file = new File(root, filemanPath);
+        boolean deleted = Filemans.delete(file);
+        if (deleted) response.setStatus(HttpURLConnection.HTTP_OK);
+        else response.sendError(HttpURLConnection.HTTP_INTERNAL_ERROR);
     }
 
     protected void options(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -225,7 +295,7 @@ public class FilemanWebSupport {
     }
 
     protected void extend(String method, HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+        response.sendError(HttpURLConnection.HTTP_BAD_METHOD, "Method Not Allowed");
     }
 
     protected void destroy() {

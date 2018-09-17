@@ -26,7 +26,7 @@ public class FilemanServletSupport extends FilemanWebSupport implements Servlet 
     }
 
     @Override
-    public void service(ServletRequest req, ServletResponse res) throws IOException {
+    public void service(ServletRequest req, ServletResponse res) throws IOException, ServletException {
         super.handle((HttpServletRequest) req, (HttpServletResponse) res);
     }
 
