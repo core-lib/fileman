@@ -40,33 +40,61 @@ public class FilemanWebSupport {
             synthesizer = Filemans.newInstance(Filemans.ifBlank(configuration.valueOf("synthesizer"), RenderSynthesizer.class.getName()));
             formatter = Filemans.newInstance(Filemans.ifBlank(configuration.valueOf("formatter"), HtmlFormatter.class.getName()));
             buffer = Integer.valueOf(Filemans.ifBlank(configuration.valueOf("buffer"), "" + 1024 * 8));
-            String fields = configuration.valueOf("fields");
-            String[] columns = fields.split("[,\\s\r\n]+");
-            Collection<Resource> resources = SimpleDetector.Builder
-                    .scan("fileman")
-                    .includeJar()
-                    .recursively()
-                    .build()
-                    .detect(new ConfigFilter());
-            Properties properties = new Properties();
-            for (Resource resource : resources) {
-                InputStream in = resource.getInputStream();
-                properties.load(in);
-            }
-            for (String column : columns) {
-                String className = properties.getProperty(column);
-                if (className == null) className = column;
-                try {
-                    Class<? extends Converter> clazz = Class.forName(className).asSubclass(Converter.class);
-                    Converter converter = clazz.newInstance();
-                    converters.add(converter);
-                } catch (Exception e) {
-                    throw new ServletException("unknown field " + column);
-                }
-            }
-
+            initConverters(configuration);
+            initExtractors(configuration);
         } catch (IOException e) {
             throw new ServletException(e);
+        }
+    }
+
+    private void initConverters(Configuration configuration) throws IOException, ServletException {
+        String fields = configuration.valueOf("fields");
+        String[] columns = fields.split("[,\\s\r\n]+");
+        Collection<Resource> resources = SimpleDetector.Builder
+                .scan("fileman")
+                .includeJar()
+                .recursively()
+                .build()
+                .detect(new ConverterConfigFilter());
+        Properties properties = new Properties();
+        for (Resource resource : resources) {
+            InputStream in = resource.getInputStream();
+            properties.load(in);
+        }
+        for (String column : columns) {
+            String className = properties.getProperty(column);
+            if (className == null) className = column;
+            try {
+                Class<? extends Converter> clazz = Class.forName(className).asSubclass(Converter.class);
+                Converter converter = clazz.newInstance();
+                converters.add(converter);
+            } catch (Exception e) {
+                throw new ServletException("unknown field " + column);
+            }
+        }
+    }
+
+    private void initExtractors(Configuration configuration) throws IOException, ServletException {
+        Collection<Resource> resources = SimpleDetector.Builder
+                .scan("fileman")
+                .includeJar()
+                .recursively()
+                .build()
+                .detect(new ExtractorConfigFilter());
+        Properties properties = new Properties();
+        for (Resource resource : resources) {
+            InputStream in = resource.getInputStream();
+            properties.load(in);
+        }
+        for (Object value : properties.values()) {
+            String className = (String) value;
+            try {
+                Class<? extends Extractor> clazz = Class.forName(className).asSubclass(Extractor.class);
+                Extractor extractor = clazz.newInstance();
+                extractors.add(extractor);
+            } catch (Exception e) {
+                throw new ServletException(e);
+            }
         }
     }
 
@@ -207,10 +235,25 @@ public class FilemanWebSupport {
         this.formatter = null;
     }
 
-    static class ConfigFilter implements Filter {
+    static class ConverterConfigFilter implements Filter {
+        private final List<String> names = Arrays.asList(
+                "converter.properties",
+                "resolver.properties",
+                "renderer.properties",
+                "adapter.properties"
+        );
+
         @Override
         public boolean accept(Resource resource, FilterChain chain) {
-            return resource.getName().endsWith(".properties") && chain.doNext(resource);
+            return names.contains(resource.getName()) && chain.doNext(resource);
+        }
+    }
+
+    static class ExtractorConfigFilter implements Filter {
+
+        @Override
+        public boolean accept(Resource resource, FilterChain chain) {
+            return "extractor.properties".equals(resource.getName()) && chain.doNext(resource);
         }
     }
 }

@@ -21,6 +21,9 @@ public class Range {
     private final long end;
 
     public Range(String unit, long start, long end) {
+        if (unit == null) throw new NullPointerException();
+        if (start < 0 || end < 0) throw new IllegalArgumentException("index must not be negative");
+        if (start > end && end > 0) throw new IllegalArgumentException("start index must not bigger than end index");
         this.unit = unit;
         this.start = start;
         this.end = end;
