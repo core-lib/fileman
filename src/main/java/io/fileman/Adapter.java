@@ -1,5 +1,6 @@
 package io.fileman;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -16,8 +17,8 @@ public abstract class Adapter implements Resolver, Renderer {
     }
 
     @Override
-    public Object render(Action action) throws IOException {
-        return resolve(action);
+    public Object render(File file, RenderContext context) throws IOException {
+        return resolve(file, new ResolveContext(context));
     }
 
 }

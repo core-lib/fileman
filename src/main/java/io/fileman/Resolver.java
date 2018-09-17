@@ -1,5 +1,6 @@
 package io.fileman;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -18,10 +19,11 @@ public interface Resolver extends Converter {
     /**
      * 解析
      *
-     * @param action 解析动作
+     * @param file    待解析文件
+     * @param context 解析上下文
      * @return 解析结果
      * @throws IOException I/O 异常
      */
-    Object resolve(Action action) throws IOException;
+    Object resolve(File file, ResolveContext context) throws IOException;
 
 }

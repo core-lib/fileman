@@ -1,5 +1,6 @@
 package io.fileman;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
@@ -14,10 +15,11 @@ public interface Synthesizer<T extends Converter> {
     /**
      * 文件信息合成
      *
-     * @param synthesization 合成动作
+     * @param file    信息合成文件
+     * @param context 合成动作
      * @return 文件信息
      * @throws IOException I/O 异常
      */
-    Map<String, Object> synthesize(Synthesization<T> synthesization) throws IOException;
+    Map<String, Object> synthesize(File file, SynthesizeContext<T> context) throws IOException;
 
 }

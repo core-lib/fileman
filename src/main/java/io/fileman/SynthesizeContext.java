@@ -6,16 +6,16 @@ import java.io.File;
 import java.util.List;
 
 /**
- * 合成动作
+ * 合成上下文
  *
  * @author 杨昌沛 646742615@qq.com
  * 2018/9/14
  */
-public class Synthesization<T extends Converter> extends Action {
+public class SynthesizeContext<T extends Converter> extends ActionContext {
     private final List<T> converters;
 
-    public Synthesization(Configuration configuration, HttpServletRequest request, HttpServletResponse response, File root, File file, List<T> converters) {
-        super(configuration, request, response, root, file);
+    public SynthesizeContext(File root, Configuration configuration, HttpServletRequest request, HttpServletResponse response, List<T> converters) {
+        super(root, configuration, request, response);
         this.converters = converters;
     }
 

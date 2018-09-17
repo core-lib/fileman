@@ -3,6 +3,7 @@ package io.fileman.formatter;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import io.fileman.Fileman;
+import io.fileman.FormatContext;
 import io.fileman.Formatter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,7 +21,8 @@ public class XmlFormatter implements Formatter {
     private final ObjectWriter writer = new XmlMapper().writerWithDefaultPrettyPrinter();
 
     @Override
-    public void format(Fileman fileman, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void format(Fileman fileman, FormatContext context) throws IOException {
+        HttpServletResponse response = context.getResponse();
         response.setContentType("application/xml");
         OutputStream out = response.getOutputStream();
         writer.writeValue(out, fileman);

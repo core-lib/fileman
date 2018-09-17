@@ -1,7 +1,7 @@
 package io.fileman.adapter;
 
-import io.fileman.Action;
 import io.fileman.Adapter;
+import io.fileman.ResolveContext;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -26,8 +26,7 @@ public class TimeAdapter extends Adapter {
     }
 
     @Override
-    public Object resolve(Action action) {
-        File file = action.getFile();
+    public Object resolve(File file, ResolveContext context) {
         Date lastModified = new Date(file.lastModified());
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(lastModified);
     }

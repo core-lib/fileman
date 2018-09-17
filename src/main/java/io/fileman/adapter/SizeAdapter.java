@@ -1,7 +1,7 @@
 package io.fileman.adapter;
 
-import io.fileman.Action;
 import io.fileman.Adapter;
+import io.fileman.ResolveContext;
 
 import java.io.File;
 
@@ -24,8 +24,7 @@ public class SizeAdapter extends Adapter {
     }
 
     @Override
-    public Object resolve(Action action) {
-        File file = action.getFile();
+    public Object resolve(File file, ResolveContext context) {
         if (file.isDirectory()) return 0L;
         else return file.length();
     }

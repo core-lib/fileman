@@ -2,6 +2,7 @@ package io.fileman.formatter;
 
 import io.fileman.Fileman;
 import io.fileman.Filemans;
+import io.fileman.FormatContext;
 import io.fileman.Formatter;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +24,8 @@ import java.util.Set;
 public class HtmlFormatter implements Formatter {
 
     @Override
-    public void format(Fileman fileman, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void format(Fileman fileman, FormatContext context) throws IOException {
+        HttpServletResponse response = context.getResponse();
         response.setContentType("text/html");
         OutputStream out = response.getOutputStream();
         OutputStreamWriter osw = new OutputStreamWriter(out);

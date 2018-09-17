@@ -3,9 +3,9 @@ package io.fileman.formatter;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import io.fileman.Fileman;
+import io.fileman.FormatContext;
 import io.fileman.Formatter;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -20,7 +20,8 @@ public class YamlFormatter implements Formatter {
     private final ObjectWriter writer = new YAMLMapper().writerWithDefaultPrettyPrinter();
 
     @Override
-    public void format(Fileman fileman, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void format(Fileman fileman, FormatContext context) throws IOException {
+        HttpServletResponse response = context.getResponse();
         response.setContentType("application/yaml");
         OutputStream out = response.getOutputStream();
         writer.writeValue(out, fileman);

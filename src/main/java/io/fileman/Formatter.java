@@ -1,7 +1,5 @@
 package io.fileman;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -15,10 +13,9 @@ public interface Formatter {
     /**
      * 格式化输出
      *
-     * @param fileman  文件目录
-     * @param request  请求
-     * @param response 回应
+     * @param fileman 文件目录
+     * @param context 格式化上下文
      */
-    void format(Fileman fileman, HttpServletRequest request, HttpServletResponse response) throws IOException;
+    void format(Fileman fileman, FormatContext context) throws IOException;
 
 }

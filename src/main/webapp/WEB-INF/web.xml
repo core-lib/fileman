@@ -14,7 +14,7 @@
         </init-param>
         <init-param>
             <param-name>synthesizer</param-name>
-            <param-value>io.fileman.RenderingSynthesizer</param-value>
+            <param-value>io.fileman.RenderSynthesizer</param-value>
         </init-param>
         <init-param>
             <param-name>formatter</param-name>

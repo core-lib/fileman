@@ -14,7 +14,7 @@ import java.util.Enumeration;
 public class ServletConfiguration implements Configuration {
     private final ServletConfig servletConfig;
 
-    public ServletConfiguration(ServletConfig servletConfig) {
+    ServletConfiguration(ServletConfig servletConfig) {
         this.servletConfig = servletConfig;
     }
 

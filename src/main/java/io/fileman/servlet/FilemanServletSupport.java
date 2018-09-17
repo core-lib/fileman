@@ -27,8 +27,8 @@ import java.util.*;
 public class FilemanServletSupport implements Servlet, Filter {
     private ServletConfig servletConfig;
     private String root;
-    private List<Converter> converters = new ArrayList<Converter>();
-    private Synthesizer synthesizer;
+    private List<Converter> converters = new ArrayList<>();
+    private Synthesizer<Converter> synthesizer;
     private Formatter formatter;
 
     @Override
@@ -36,7 +36,7 @@ public class FilemanServletSupport implements Servlet, Filter {
         try {
             servletConfig = config;
             root = Filemans.ifBlank(config.getInitParameter("root"), System.getProperty("user.dir"));
-            synthesizer = Filemans.newInstance(Filemans.ifBlank(config.getInitParameter("synthesizer"), RenderingSynthesizer.class.getName()));
+            synthesizer = Filemans.newInstance(Filemans.ifBlank(config.getInitParameter("synthesizer"), RenderSynthesizer.class.getName()));
             formatter = Filemans.newInstance(Filemans.ifBlank(config.getInitParameter("formatter"), HtmlFormatter.class.getName()));
             String fields = config.getInitParameter("fields");
             String[] columns = fields.split("[,\\s\r\n]+");
@@ -103,16 +103,16 @@ public class FilemanServletSupport implements Servlet, Filter {
                 child.setUri(("/" + contextPath + "/" + servletPath + "/" + filemanPath + "/" + sub.getName()).replaceAll("/+", "/"));
                 child.setPath(filemanPath + "/" + sub.getName());
                 child.setFolder(sub.isDirectory());
-                Synthesization<Converter> synthesization = new Synthesization<Converter>(configuration, request, response, root, sub, converters);
-                Map<String, Object> properties = synthesizer.synthesize(synthesization);
+                SynthesizeContext<Converter> context = new SynthesizeContext<>(root, configuration, request, response, converters);
+                Map<String, Object> properties = synthesizer.synthesize(sub, context);
                 child.setProperties(properties);
                 fileman.getChildren().add(child);
             }
-            Synthesization<Converter> synthesization = new Synthesization<Converter>(configuration, request, response, root, file, converters);
-            Map<String, Object> properties = synthesizer.synthesize(synthesization);
+            SynthesizeContext<Converter> context = new SynthesizeContext<>(root, configuration, request, response, converters);
+            Map<String, Object> properties = synthesizer.synthesize(file, context);
             fileman.setProperties(properties);
 
-            formatter.format(fileman, request, response);
+            formatter.format(fileman, new FormatContext(root, configuration, request, response));
         }
         // 是文件
         else if (file.isFile()) {
