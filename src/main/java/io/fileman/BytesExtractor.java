@@ -27,14 +27,15 @@ public class BytesExtractor implements Extractor {
             raf = new RandomAccessFile(file, "rws");
             long start = range.getStart();
             long end = range.getEnd() > 0 ? range.getEnd() : Long.MAX_VALUE;
-            long length = Math.min(end, raf.length() - 1) - start;
+            long total = raf.length();
+            long length = Math.min(end, total - 1) - start;
             HttpServletResponse response = context.getResponse();
             if (length <= 0) {
                 response.sendError(HttpURLConnection.HTTP_NO_CONTENT, "No Content");
                 return;
             }
             response.setStatus(HttpURLConnection.HTTP_PARTIAL);
-            response.setHeader("Content-Range", "bytes " + start + "-" + Math.min(end, raf.length() - 1) + "/" + raf.length());
+            response.setHeader("Content-Range", "bytes " + start + "-" + Math.min(end, total - 1) + "/" + total);
             OutputStream out = response.getOutputStream();
             raf.seek(start);
             byte[] buf = new byte[1024 * 8];

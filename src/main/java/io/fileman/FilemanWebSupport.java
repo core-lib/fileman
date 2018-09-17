@@ -31,7 +31,7 @@ public class FilemanWebSupport {
     protected Formatter formatter;
     protected int buffer;
     protected List<Converter> converters = new ArrayList<>();
-    protected List<Extractor> extractors = new ArrayList<>();
+    protected Map<String, Extractor> extractors = new LinkedHashMap<>();
 
     protected void init(Configuration configuration) throws ServletException {
         try {
@@ -86,12 +86,13 @@ public class FilemanWebSupport {
             InputStream in = resource.getInputStream();
             properties.load(in);
         }
-        for (Object value : properties.values()) {
-            String className = (String) value;
+        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
             try {
+                String unit = (String) entry.getKey();
+                String className = (String) entry.getValue();
                 Class<? extends Extractor> clazz = Class.forName(className).asSubclass(Extractor.class);
                 Extractor extractor = clazz.newInstance();
-                extractors.add(extractor);
+                extractors.put(unit, extractor);
             } catch (Exception e) {
                 throw new ServletException(e);
             }
@@ -166,6 +167,7 @@ public class FilemanWebSupport {
         // 是文件
         else if (file.isFile()) {
             String range = request.getHeader("Range");
+            response.setHeader("Accept-Ranges", Filemans.join(extractors.keySet(), ", "));
             // 全部读取
             if (Filemans.isBlank(range)) {
                 Path path = Paths.get(file.toURI());
@@ -192,7 +194,7 @@ public class FilemanWebSupport {
             else {
                 Range r = Range.valueOf(range);
                 Extractor extractor = null;
-                for (Extractor e : extractors) if (e.supports(file, r)) extractor = e;
+                for (Extractor e : extractors.values()) if (e.supports(file, r)) extractor = e;
                 if (extractor == null) response.sendError(HttpURLConnection.HTTP_NOT_IMPLEMENTED, "Not Implemented");
                 else extractor.extract(file, r, new ExtractContext(new File(root), configuration, request, response));
             }

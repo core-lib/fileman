@@ -2,6 +2,8 @@ package io.fileman;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * 文件管理器工具类
@@ -54,5 +56,15 @@ public abstract class Filemans {
         } catch (IOException e) {
             // nothing to do...
         }
+    }
+
+    public static String join(Collection<?> collection, String delimit) {
+        StringBuilder joined = new StringBuilder();
+        Iterator<?> iterator = collection.iterator();
+        while (iterator.hasNext()) {
+            joined.append(iterator.next());
+            if (iterator.hasNext()) joined.append(delimit);
+        }
+        return joined.toString();
     }
 }
