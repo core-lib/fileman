@@ -87,9 +87,12 @@ public class FilemanWebSupport {
             InputStream in = resource.getInputStream();
             properties.load(in);
         }
+        String ranges = configuration.valueOf("ranges");
+        List<String> units = Filemans.isBlank(ranges) ? Collections.<String>emptyList() : Arrays.asList(ranges.split("[,\\s\r\n]+"));
         for (Map.Entry<Object, Object> entry : properties.entrySet()) {
             try {
                 String unit = (String) entry.getKey();
+                if (!units.isEmpty() && !units.contains(unit)) continue;
                 String className = (String) entry.getValue();
                 Class<? extends Extractor> clazz = Class.forName(className).asSubclass(Extractor.class);
                 Extractor extractor = clazz.newInstance();
@@ -115,14 +118,8 @@ public class FilemanWebSupport {
             case "DELETE":
                 delete(request, response);
                 break;
-            case "OPTIONS":
-                options(request, response);
-                break;
-            case "TRACE":
-                trace(request, response);
-                break;
             default:
-                extend(method, request, response);
+                response.sendError(HttpURLConnection.HTTP_BAD_METHOD, "Method Not Allowed");
                 break;
         }
     }
@@ -241,7 +238,6 @@ public class FilemanWebSupport {
             }
             part.write(new File(file, filename).getPath());
         }
-        response.setStatus(HttpURLConnection.HTTP_CREATED);
     }
 
     protected void put(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -270,7 +266,6 @@ public class FilemanWebSupport {
         }
         Part part = parts.iterator().next();
         part.write(file.getPath());
-        response.setStatus(HttpURLConnection.HTTP_NO_CONTENT);
     }
 
     protected void delete(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -282,20 +277,7 @@ public class FilemanWebSupport {
         filemanPath = URLDecoder.decode(filemanPath, "UTF-8");
         File file = new File(root, filemanPath);
         boolean deleted = Filemans.delete(file);
-        if (deleted) response.setStatus(HttpURLConnection.HTTP_OK);
-        else response.sendError(HttpURLConnection.HTTP_INTERNAL_ERROR);
-    }
-
-    protected void options(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-    }
-
-    protected void trace(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-    }
-
-    protected void extend(String method, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.sendError(HttpURLConnection.HTTP_BAD_METHOD, "Method Not Allowed");
+        if (!deleted) response.sendError(HttpURLConnection.HTTP_INTERNAL_ERROR);
     }
 
     protected void destroy() {
