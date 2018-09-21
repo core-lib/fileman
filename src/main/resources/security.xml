@@ -1,0 +1,6 @@
+<fileman algorithm="MD5">
+    <resource id="goods" method="GET, POST, PUT, DELETE" path="/goods/**"/>
+    <resource id="orders" method="GET, POST" path="/orders/**"/>
+    <role id="admin" resources="goods, orders"/>
+    <user id="payne" password="123456"/>
+</fileman>
