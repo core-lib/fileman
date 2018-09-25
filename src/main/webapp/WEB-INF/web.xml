@@ -30,7 +30,11 @@
         </init-param>
         <init-param>
             <param-name>security-config-location</param-name>
-            <param-value>/fileman-security.xml</param-value>
+            <param-value>fileman-security.xml</param-value>
+        </init-param>
+        <init-param>
+            <param-name>security-auth-type</param-name>
+            <param-value>Basic</param-value>
         </init-param>
         <multipart-config/>
     </servlet>

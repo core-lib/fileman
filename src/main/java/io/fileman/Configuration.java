@@ -23,4 +23,13 @@ public interface Configuration {
      */
     String valueOf(String name);
 
+    /**
+     * 获取指定配置项名称的配置值
+     *
+     * @param name         配置项名称
+     * @param defaultValue 缺省值
+     * @return 配置值
+     */
+    String valueOf(String name, String defaultValue);
+
 }

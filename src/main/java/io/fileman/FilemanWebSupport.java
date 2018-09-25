@@ -122,22 +122,22 @@ public class FilemanWebSupport implements Interceptor {
             InputStream in = resource.getInputStream();
             properties.load(in);
         }
-        String ranges = configuration.valueOf("interceptors");
-        List<String> units = Filemans.isBlank(ranges) ? Collections.<String>emptyList() : Arrays.asList(ranges.split(SPLIT_DELIMIT_REGEX));
+        String value = configuration.valueOf("interceptors");
+        List<String> names = Filemans.isBlank(value) ? Collections.<String>emptyList() : Arrays.asList(value.split(SPLIT_DELIMIT_REGEX));
         for (Map.Entry<Object, Object> entry : properties.entrySet()) {
             try {
                 String unit = (String) entry.getKey();
-                if (!units.isEmpty() && !units.contains(unit)) continue;
+                if (!names.isEmpty() && !names.contains(unit)) continue;
                 String className = (String) entry.getValue();
                 Class<? extends Interceptor> clazz = Class.forName(className).asSubclass(Interceptor.class);
                 Interceptor interceptor = clazz.newInstance();
                 if (interceptor instanceof Initialable) ((Initialable) interceptor).initialize(configuration);
-                interceptors.add(interceptor);
+                this.interceptors.add(interceptor);
             } catch (Exception e) {
                 throw new ServletException(e);
             }
         }
-        interceptors.add(this);
+        this.interceptors.add(this);
     }
 
     protected void handle(HttpServletRequest request, HttpServletResponse response) throws Exception {

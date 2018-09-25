@@ -26,4 +26,10 @@ public class FilemanServletConfiguration implements Configuration {
         return servletConfig.getInitParameter(name);
     }
 
+    @Override
+    public String valueOf(String name, String defaultValue) {
+        String value = valueOf(name);
+        return value != null ? value : defaultValue;
+    }
+
 }
