@@ -9,6 +9,7 @@ import io.fileman.FilemanException;
  * 2018/9/25
  */
 public class SecurityException extends FilemanException {
+    private static final long serialVersionUID = -5587510389862601305L;
 
     public SecurityException() {
     }

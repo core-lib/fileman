@@ -7,6 +7,7 @@ package io.fileman;
  * 2018/9/25
  */
 public class FilemanException extends Exception {
+    private static final long serialVersionUID = -1184688801507341907L;
 
     public FilemanException() {
     }

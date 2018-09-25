@@ -7,6 +7,8 @@ package io.fileman.security;
  * 2018/9/25
  */
 public class UnauthorizedSecurityException extends SecurityException {
+    private static final long serialVersionUID = -4705920414901282544L;
+
     public UnauthorizedSecurityException() {
     }
 

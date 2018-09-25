@@ -64,7 +64,8 @@ public class SecurityInterceptor implements Interceptor, Initialable, Filter {
         }
         {
             String authType = configuration.valueOf("security-auth-type", "Basic");
-            Collection<io.detector.Resource> resources = SimpleDetector.Builder.scan("/fileman")
+            Collection<io.detector.Resource> resources = SimpleDetector.Builder
+                    .scan("fileman")
                     .includeJar()
                     .recursively()
                     .build()

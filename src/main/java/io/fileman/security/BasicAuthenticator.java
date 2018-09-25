@@ -24,7 +24,7 @@ public class BasicAuthenticator implements Authenticator {
     public void authenticate(File file, AuthenticateContext context) throws SecurityException {
         HttpServletRequest request = context.getRequest();
         String authorization = request.getHeader("Authorization");
-        int index = authorization.indexOf(' ');
+        int index = authorization != null ? authorization.indexOf(' ') : -1;
         if (index < 0) throw new UnauthorizedSecurityException();
         String type = authorization.substring(0, index);
         if (!"Basic".equalsIgnoreCase(type)) throw new UnauthorizedSecurityException();
@@ -40,6 +40,7 @@ public class BasicAuthenticator implements Authenticator {
         String method = request.getMethod();
         File root = context.getRoot();
         String path = root.toURI().relativize(file.toURI()).toString();
+        if (path.isEmpty()) path = "/";
         if (!user.matches(method, path)) throw new ForbiddenSecurityException();
     }
 

@@ -7,6 +7,8 @@ package io.fileman.security;
  * 2018/9/25
  */
 public class ForbiddenSecurityException extends SecurityException {
+    private static final long serialVersionUID = -7819828564618769690L;
+
     public ForbiddenSecurityException() {
     }
 
