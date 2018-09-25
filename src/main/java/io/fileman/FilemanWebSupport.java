@@ -25,7 +25,7 @@ import java.util.*;
  * @author 杨昌沛 646742615@qq.com
  * 2018/9/14
  */
-public class FilemanWebSupport {
+public class FilemanWebSupport implements Interceptor {
     protected Configuration configuration;
     protected String root;
     protected Synthesizer<Converter> synthesizer;
@@ -33,6 +33,7 @@ public class FilemanWebSupport {
     protected int buffer;
     protected List<Converter> converters = new ArrayList<>();
     protected Map<String, Extractor> extractors = new LinkedHashMap<>();
+    protected List<Interceptor> interceptors = new ArrayList<>();
 
     protected void init(Configuration configuration) throws ServletException {
         try {
@@ -43,14 +44,16 @@ public class FilemanWebSupport {
             buffer = Integer.valueOf(Filemans.ifBlank(configuration.valueOf("buffer"), "" + 1024 * 8));
             initConverters(configuration);
             initExtractors(configuration);
+            initInterceptors(configuration);
         } catch (IOException e) {
             throw new ServletException(e);
         }
     }
 
     private void initConverters(Configuration configuration) throws IOException, ServletException {
+        converters.clear();
         String fields = configuration.valueOf("fields");
-        String[] columns = fields.split("[,\\s\r\n]+");
+        String[] columns = fields.split(SPLIT_DELIMIT_REGEX);
         Collection<Resource> resources = SimpleDetector.Builder
                 .scan("fileman")
                 .includeJar()
@@ -68,6 +71,7 @@ public class FilemanWebSupport {
             try {
                 Class<? extends Converter> clazz = Class.forName(className).asSubclass(Converter.class);
                 Converter converter = clazz.newInstance();
+                if (converter instanceof Initialable) ((Initialable) converter).initialize(configuration);
                 converters.add(converter);
             } catch (Exception e) {
                 throw new ServletException("unknown field " + column);
@@ -76,6 +80,7 @@ public class FilemanWebSupport {
     }
 
     private void initExtractors(Configuration configuration) throws IOException, ServletException {
+        extractors.clear();
         Collection<Resource> resources = SimpleDetector.Builder
                 .scan("fileman")
                 .includeJar()
@@ -88,7 +93,7 @@ public class FilemanWebSupport {
             properties.load(in);
         }
         String ranges = configuration.valueOf("ranges");
-        List<String> units = Filemans.isBlank(ranges) ? Collections.<String>emptyList() : Arrays.asList(ranges.split("[,\\s\r\n]+"));
+        List<String> units = Filemans.isBlank(ranges) ? Collections.<String>emptyList() : Arrays.asList(ranges.split(SPLIT_DELIMIT_REGEX));
         for (Map.Entry<Object, Object> entry : properties.entrySet()) {
             try {
                 String unit = (String) entry.getKey();
@@ -96,6 +101,7 @@ public class FilemanWebSupport {
                 String className = (String) entry.getValue();
                 Class<? extends Extractor> clazz = Class.forName(className).asSubclass(Extractor.class);
                 Extractor extractor = clazz.newInstance();
+                if (extractor instanceof Initialable) ((Initialable) extractor).initialize(configuration);
                 extractors.put(unit, extractor);
             } catch (Exception e) {
                 throw new ServletException(e);
@@ -103,7 +109,53 @@ public class FilemanWebSupport {
         }
     }
 
-    protected void handle(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    private void initInterceptors(Configuration configuration) throws IOException, ServletException {
+        interceptors.clear();
+        Collection<Resource> resources = SimpleDetector.Builder
+                .scan("fileman")
+                .includeJar()
+                .recursively()
+                .build()
+                .detect(new InterceptorConfigFilter());
+        Properties properties = new Properties();
+        for (Resource resource : resources) {
+            InputStream in = resource.getInputStream();
+            properties.load(in);
+        }
+        String ranges = configuration.valueOf("interceptors");
+        List<String> units = Filemans.isBlank(ranges) ? Collections.<String>emptyList() : Arrays.asList(ranges.split(SPLIT_DELIMIT_REGEX));
+        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+            try {
+                String unit = (String) entry.getKey();
+                if (!units.isEmpty() && !units.contains(unit)) continue;
+                String className = (String) entry.getValue();
+                Class<? extends Interceptor> clazz = Class.forName(className).asSubclass(Interceptor.class);
+                Interceptor interceptor = clazz.newInstance();
+                if (interceptor instanceof Initialable) ((Initialable) interceptor).initialize(configuration);
+                interceptors.add(interceptor);
+            } catch (Exception e) {
+                throw new ServletException(e);
+            }
+        }
+        interceptors.add(this);
+    }
+
+    protected void handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String requestPath = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        String servletPath = request.getServletPath();
+        String filemanPath = requestPath.substring(contextPath.length() + servletPath.length());
+        while (filemanPath.endsWith("/")) filemanPath = filemanPath.substring(0, filemanPath.length() - 1);
+        filemanPath = URLDecoder.decode(filemanPath, "UTF-8");
+        File file = new File(root, filemanPath);
+        InterceptContext context = new InterceptContext(new File(root), configuration, request, response, interceptors.iterator());
+        context.doNext(file);
+    }
+
+    @Override
+    public void intercept(File file, InterceptContext context) throws Exception {
+        HttpServletRequest request = context.getRequest();
+        HttpServletResponse response = context.getResponse();
         String method = request.getMethod().toUpperCase();
         switch (method) {
             case "GET":
@@ -281,12 +333,12 @@ public class FilemanWebSupport {
     }
 
     protected void destroy() {
-        this.configuration = null;
-        this.root = null;
-        this.converters.clear();
-        this.converters = null;
-        this.synthesizer = null;
-        this.formatter = null;
+        Filemans.release(configuration);
+        Filemans.release(synthesizer);
+        Filemans.release(formatter);
+        for (Converter converter : converters) Filemans.release(converter);
+        for (Extractor extractor : extractors.values()) Filemans.release(extractor);
+        for (Interceptor interceptor : interceptors) Filemans.release(interceptor);
     }
 
     static class ConverterConfigFilter implements Filter {
@@ -308,6 +360,14 @@ public class FilemanWebSupport {
         @Override
         public boolean accept(Resource resource, FilterChain chain) {
             return "extractor.properties".equals(resource.getName()) && chain.doNext(resource);
+        }
+    }
+
+    static class InterceptorConfigFilter implements Filter {
+
+        @Override
+        public boolean accept(Resource resource, FilterChain chain) {
+            return "interceptor.properties".equals(resource.getName()) && chain.doNext(resource);
         }
     }
 }

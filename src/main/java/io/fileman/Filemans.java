@@ -88,4 +88,12 @@ public abstract class Filemans {
         return file.delete() && deleted;
     }
 
+    public static void release(Object bean) {
+        try {
+            if (bean instanceof Releasable) ((Releasable) bean).release();
+        } catch (Exception e) {
+            // do nothing
+        }
+    }
+
 }

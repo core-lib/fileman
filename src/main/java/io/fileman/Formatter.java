@@ -8,7 +8,7 @@ import java.io.IOException;
  * @author 杨昌沛 646742615@qq.com
  * 2018/9/14
  */
-public interface Formatter {
+public interface Formatter extends Plugin {
 
     /**
      * 格式化输出

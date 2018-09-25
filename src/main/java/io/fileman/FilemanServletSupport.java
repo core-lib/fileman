@@ -3,7 +3,6 @@ package io.fileman;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
  * 文件管理Servlet集成
@@ -26,8 +25,12 @@ public class FilemanServletSupport extends FilemanWebSupport implements Servlet 
     }
 
     @Override
-    public void service(ServletRequest req, ServletResponse res) throws IOException, ServletException {
-        super.handle((HttpServletRequest) req, (HttpServletResponse) res);
+    public void service(ServletRequest req, ServletResponse res) throws ServletException {
+        try {
+            super.handle((HttpServletRequest) req, (HttpServletResponse) res);
+        } catch (Exception e) {
+            throw new ServletException(e);
+        }
     }
 
     @Override

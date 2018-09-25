@@ -1,0 +1,5 @@
+<security auth-type="basic">
+    <resource id="all" method="*" path="/**"/>
+    <role id="admin" resources="all"/>
+    <user id="admin" password="admin" roles="admin"/>
+</security>

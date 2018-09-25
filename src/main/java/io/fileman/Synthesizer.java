@@ -10,7 +10,7 @@ import java.util.Map;
  * @author 杨昌沛 646742615@qq.com
  * 2018/9/14
  */
-public interface Synthesizer<T extends Converter> {
+public interface Synthesizer<T extends Converter> extends Plugin {
 
     /**
      * 文件信息合成

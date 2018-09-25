@@ -9,7 +9,7 @@ import java.io.IOException;
  * @author 杨昌沛 646742615@qq.com
  * 2018/9/17
  */
-public interface Extractor {
+public interface Extractor extends Plugin {
 
     /**
      * 判断是否支持指定文件的指定范围内容提取

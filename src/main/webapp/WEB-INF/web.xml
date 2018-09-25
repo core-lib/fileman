@@ -24,6 +24,14 @@
                 name, size, time, type, etag
             </param-value>
         </init-param>
+        <init-param>
+            <param-name>interceptors</param-name>
+            <param-value>security</param-value>
+        </init-param>
+        <init-param>
+            <param-name>security-config-location</param-name>
+            <param-value>/fileman-security.xml</param-value>
+        </init-param>
         <multipart-config/>
     </servlet>
     <servlet-mapping>
