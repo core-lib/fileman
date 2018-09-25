@@ -1,11 +1,10 @@
 package io.fileman.formatter;
 
 import io.fileman.Fileman;
-import io.fileman.Filemans;
 import io.fileman.FormatContext;
 import io.fileman.Formatter;
+import io.fileman.Toolkit;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,7 +29,7 @@ public class HtmlFormatter implements Formatter {
         OutputStream out = response.getOutputStream();
         OutputStreamWriter osw = new OutputStreamWriter(out);
         PrintWriter pw = new PrintWriter(osw);
-        String path = Filemans.ifEmpty(fileman.getPath(), "/");
+        String path = Toolkit.ifEmpty(fileman.getPath(), "/");
 
         pw.println("<html>");
         pw.println("<head>");

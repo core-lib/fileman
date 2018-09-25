@@ -38,10 +38,10 @@ public class FilemanWebSupport implements Interceptor {
     protected void init(Configuration configuration) throws ServletException {
         try {
             this.configuration = configuration;
-            root = Filemans.ifBlank(configuration.valueOf("root"), System.getProperty("user.dir"));
-            synthesizer = Filemans.newInstance(Filemans.ifBlank(configuration.valueOf("synthesizer"), RenderSynthesizer.class.getName()));
-            formatter = Filemans.newInstance(Filemans.ifBlank(configuration.valueOf("formatter"), HtmlFormatter.class.getName()));
-            buffer = Integer.valueOf(Filemans.ifBlank(configuration.valueOf("buffer"), "" + 1024 * 8));
+            root = Toolkit.ifBlank(configuration.valueOf("root"), System.getProperty("user.dir"));
+            synthesizer = Toolkit.newInstance(Toolkit.ifBlank(configuration.valueOf("synthesizer"), RenderSynthesizer.class.getName()));
+            formatter = Toolkit.newInstance(Toolkit.ifBlank(configuration.valueOf("formatter"), HtmlFormatter.class.getName()));
+            buffer = Integer.valueOf(Toolkit.ifBlank(configuration.valueOf("buffer"), "" + 1024 * 8));
             initConverters(configuration);
             initExtractors(configuration);
             initInterceptors(configuration);
@@ -93,7 +93,7 @@ public class FilemanWebSupport implements Interceptor {
             properties.load(in);
         }
         String ranges = configuration.valueOf("ranges");
-        List<String> units = Filemans.isBlank(ranges) ? Collections.<String>emptyList() : Arrays.asList(ranges.split(SPLIT_DELIMIT_REGEX));
+        List<String> units = Toolkit.isBlank(ranges) ? Collections.<String>emptyList() : Arrays.asList(ranges.split(SPLIT_DELIMIT_REGEX));
         for (Map.Entry<Object, Object> entry : properties.entrySet()) {
             try {
                 String unit = (String) entry.getKey();
@@ -123,7 +123,7 @@ public class FilemanWebSupport implements Interceptor {
             properties.load(in);
         }
         String value = configuration.valueOf("interceptors");
-        List<String> names = Filemans.isBlank(value) ? Collections.<String>emptyList() : Arrays.asList(value.split(SPLIT_DELIMIT_REGEX));
+        List<String> names = Toolkit.isBlank(value) ? Collections.<String>emptyList() : Arrays.asList(value.split(SPLIT_DELIMIT_REGEX));
         for (Map.Entry<Object, Object> entry : properties.entrySet()) {
             try {
                 String unit = (String) entry.getKey();
@@ -217,9 +217,9 @@ public class FilemanWebSupport implements Interceptor {
         // 是文件
         else if (file.isFile()) {
             String range = request.getHeader("Range");
-            response.setHeader("Accept-Ranges", Filemans.join(extractors.keySet(), ", "));
+            response.setHeader("Accept-Ranges", Toolkit.join(extractors.keySet(), ", "));
             // 全部读取
-            if (Filemans.isBlank(range)) {
+            if (Toolkit.isBlank(range)) {
                 Path path = Paths.get(file.toURI());
                 String contentType = Files.probeContentType(path);
                 if (contentType == null) contentType = "application/octet-stream";
@@ -237,7 +237,7 @@ public class FilemanWebSupport implements Interceptor {
                     int len;
                     while ((len = in.read(buf)) != -1) out.write(buf, 0, len);
                 } finally {
-                    Filemans.close(in);
+                    Toolkit.close(in);
                 }
             }
             // 部分读取
@@ -286,7 +286,7 @@ public class FilemanWebSupport implements Interceptor {
             for (String segment : segments) {
                 String[] keyValue = segment.split("\\s*=\\s*");
                 if (!"filename".equals(keyValue[0])) continue;
-                filename = Filemans.unquote(keyValue[1]);
+                filename = Toolkit.unquote(keyValue[1]);
             }
             part.write(new File(file, filename).getPath());
         }
@@ -328,17 +328,17 @@ public class FilemanWebSupport implements Interceptor {
         while (filemanPath.endsWith("/")) filemanPath = filemanPath.substring(0, filemanPath.length() - 1);
         filemanPath = URLDecoder.decode(filemanPath, "UTF-8");
         File file = new File(root, filemanPath);
-        boolean deleted = Filemans.delete(file);
+        boolean deleted = Toolkit.delete(file);
         if (!deleted) response.sendError(HttpURLConnection.HTTP_INTERNAL_ERROR);
     }
 
     protected void destroy() {
-        Filemans.release(configuration);
-        Filemans.release(synthesizer);
-        Filemans.release(formatter);
-        for (Converter converter : converters) Filemans.release(converter);
-        for (Extractor extractor : extractors.values()) Filemans.release(extractor);
-        for (Interceptor interceptor : interceptors) Filemans.release(interceptor);
+        Toolkit.release(configuration);
+        Toolkit.release(synthesizer);
+        Toolkit.release(formatter);
+        for (Converter converter : converters) Toolkit.release(converter);
+        for (Extractor extractor : extractors.values()) Toolkit.release(extractor);
+        for (Interceptor interceptor : interceptors) Toolkit.release(interceptor);
     }
 
     static class ConverterConfigFilter implements Filter {

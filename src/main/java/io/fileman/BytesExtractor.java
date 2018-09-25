@@ -48,7 +48,7 @@ public class BytesExtractor implements Extractor {
                 length -= len;
             }
         } finally {
-            Filemans.close(raf);
+            Toolkit.close(raf);
         }
     }
 

@@ -32,7 +32,7 @@ public class SecurityInterceptor implements Interceptor, Initialable, Filter {
     @Override
     public void initialize(Configuration configuration) throws Exception {
         String location = configuration.valueOf("security-config-location");
-        if (Filemans.isBlank(location)) location = "fileman-security.xml";
+        if (Toolkit.isBlank(location)) location = "fileman-security.xml";
         String[] locations = location.split(SPLIT_DELIMIT_REGEX);
         ClassLoader classLoader = this.getClass().getClassLoader();
         for (String config : locations) {
@@ -63,7 +63,7 @@ public class SecurityInterceptor implements Interceptor, Initialable, Filter {
             }
         }
         {
-            String authType = configuration.valueOf("security-auth-type", "Basic");
+            String algorithm = configuration.valueOf("security-auth-type", "Basic");
             Collection<io.detector.Resource> resources = SimpleDetector.Builder
                     .scan("fileman")
                     .includeJar()
@@ -75,7 +75,7 @@ public class SecurityInterceptor implements Interceptor, Initialable, Filter {
                 InputStream in = resource.getInputStream();
                 properties.load(in);
             }
-            String className = properties.getProperty(authType);
+            String className = properties.getProperty(algorithm);
             authenticator = Class.forName(className).asSubclass(Authenticator.class).newInstance();
         }
     }

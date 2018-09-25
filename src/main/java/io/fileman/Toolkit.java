@@ -12,9 +12,9 @@ import java.util.Iterator;
  * @author 杨昌沛 646742615@qq.com
  * 2018/9/14
  */
-public abstract class Filemans {
+public abstract class Toolkit {
 
-    private Filemans() {
+    private Toolkit() {
         throw new UnsupportedOperationException();
     }
 
