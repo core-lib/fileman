@@ -7,7 +7,7 @@
     <groupId>io.fileman</groupId>
     <artifactId>fileman</artifactId>
     <version>v1.0.0</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>fileman</name>
 
     <properties>
@@ -37,24 +37,27 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.core-lib</groupId>
-            <artifactId>detector</artifactId>
-            <version>v1.0.1</version>
-        </dependency>
-        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.9.5</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
             <version>2.9.5</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
             <version>2.9.5</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.core-lib</groupId>
+            <artifactId>detector</artifactId>
+            <version>v1.0.1</version>
         </dependency>
         <dependency>
             <groupId>dom4j</groupId>
@@ -69,22 +72,7 @@
     </dependencies>
 
     <build>
-        <finalName>fileman</finalName>
         <plugins>
-            <plugin>
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
-                <version>2.2</version>
-                <configuration>
-                    <url>http://localhost:8080/manager/text</url>
-                    <port>8080</port>
-                    <server>tomcat7</server>
-                    <username>admin</username>
-                    <password>admin</password>
-                    <uriEncoding>UTF-8</uriEncoding>
-                    <path>/</path>
-                </configuration>
-            </plugin>
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
                 <version>3.0.0</version>
