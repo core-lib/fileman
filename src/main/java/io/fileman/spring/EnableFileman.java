@@ -24,6 +24,11 @@ import java.lang.annotation.*;
 public @interface EnableFileman {
 
     /**
+     * @return Fileman root folder
+     */
+    String value();
+
+    /**
      * @return Servlet name
      */
     String name() default "fileman";
@@ -31,7 +36,7 @@ public @interface EnableFileman {
     /**
      * @return URL patterns
      */
-    String[] value() default {"/fileman/*"};
+    String[] mappings() default {"/fileman/*"};
 
     /**
      * @return Filter Class

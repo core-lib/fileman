@@ -33,7 +33,7 @@ public class FilemanServletRegistrar implements ImportBeanDefinitionRegistrar {
         int order = attributes.getNumber("order");
         fileman.getPropertyValues().add("order", order);
 
-        String[] mappings = attributes.getStringArray("value");
+        String[] mappings = attributes.getStringArray("mappings");
         fileman.getPropertyValues().add("urlMappings", Arrays.asList(mappings));
 
         Class<?> servlet = attributes.getClass("servlet");
@@ -58,6 +58,7 @@ public class FilemanServletRegistrar implements ImportBeanDefinitionRegistrar {
         AnnotationAttributes[] params = attributes.getAnnotationArray("params");
         for (AnnotationAttributes param : params) parameters.put(param.getString("name"), param.getString("value"));
 
+        parameters.put("root", attributes.getString("value"));
         parameters.put("buffer", attributes.getNumber("buffer").toString());
         parameters.put("fields", Toolkit.join(attributes.getStringArray("fields"), ","));
         parameters.put("ranges", Toolkit.join(attributes.getStringArray("ranges"), ","));
