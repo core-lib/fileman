@@ -16,8 +16,8 @@ import java.net.HttpURLConnection;
 public class BytesExtractor implements Extractor {
 
     @Override
-    public boolean supports(File file, Range range) {
-        return "bytes".equalsIgnoreCase(range.getUnit());
+    public String unit() {
+        return "bytes";
     }
 
     @Override

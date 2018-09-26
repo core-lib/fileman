@@ -12,13 +12,11 @@ import java.io.IOException;
 public interface Extractor extends Plugin {
 
     /**
-     * 判断是否支持指定文件的指定范围内容提取
+     * 获取该提取器的单位名称
      *
-     * @param file  文件
-     * @param range 内容范围
-     * @return 如果支持则返回true，否则返回false
+     * @return 单位名称
      */
-    boolean supports(File file, Range range);
+    String unit();
 
     /**
      * 提取指定文件的指定内容范围

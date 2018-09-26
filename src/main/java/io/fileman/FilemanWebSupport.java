@@ -32,7 +32,7 @@ public class FilemanWebSupport implements Interceptor {
     protected Formatter formatter;
     protected int buffer;
     protected List<Converter> converters = new ArrayList<>();
-    protected Map<String, Extractor> extractors = new LinkedHashMap<>();
+    protected List<Extractor> extractors = new ArrayList<>();
     protected List<Interceptor> interceptors = new ArrayList<>();
 
     protected void init(Configuration configuration) throws ServletException {
@@ -124,11 +124,10 @@ public class FilemanWebSupport implements Interceptor {
         }
         String value = configuration.valueOf("interceptors");
         List<String> names = Toolkit.isBlank(value) ? Collections.<String>emptyList() : Arrays.asList(value.split(SPLIT_DELIMIT_REGEX));
-        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+        for (String name : names) {
             try {
-                String name = (String) entry.getKey();
-                if (!names.isEmpty() && !names.contains(name)) continue;
-                String className = (String) entry.getValue();
+                String className = properties.getProperty(name);
+                if (className == null) className = name;
                 Class<? extends Interceptor> clazz = Class.forName(className).asSubclass(Interceptor.class);
                 Interceptor interceptor = clazz.newInstance();
                 if (interceptor instanceof Initialable) ((Initialable) interceptor).initialize(configuration);
@@ -244,7 +243,7 @@ public class FilemanWebSupport implements Interceptor {
             else {
                 Range r = Range.valueOf(range);
                 Extractor extractor = null;
-                for (Extractor e : extractors.values()) if (e.supports(file, r)) extractor = e;
+                for (Extractor e : extractors) if (e.supports(file, r)) extractor = e;
                 if (extractor == null) response.sendError(HttpURLConnection.HTTP_NOT_IMPLEMENTED, "Not Implemented");
                 else extractor.extract(file, r, new ExtractContext(new File(root), configuration, request, response));
             }
@@ -337,7 +336,7 @@ public class FilemanWebSupport implements Interceptor {
         Toolkit.release(synthesizer);
         Toolkit.release(formatter);
         for (Converter converter : converters) Toolkit.release(converter);
-        for (Extractor extractor : extractors.values()) Toolkit.release(extractor);
+        for (Extractor extractor : extractors) Toolkit.release(extractor);
         for (Interceptor interceptor : interceptors) Toolkit.release(interceptor);
     }
 
