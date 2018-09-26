@@ -35,8 +35,8 @@ public class Resource extends Node {
         String[] expressions = path.split("\\s*,\\s*");
         for (String expression : expressions) {
             for (String symbol : SYMBOLS) expression = expression.replace(symbol, '\\' + symbol);
-            expression = expression.replace("**", ".*");
-            expression = expression.replace("*", "[^/]*");
+            expression = expression.replace("**", ".{0,}");
+            expression = expression.replace("*", "[^/]{0,}");
             expression = expression.replace("?", ".{1}");
             patterns.add(Pattern.compile(expression));
         }
