@@ -126,8 +126,8 @@ public class FilemanWebSupport implements Interceptor {
         List<String> names = Toolkit.isBlank(value) ? Collections.<String>emptyList() : Arrays.asList(value.split(SPLIT_DELIMIT_REGEX));
         for (Map.Entry<Object, Object> entry : properties.entrySet()) {
             try {
-                String unit = (String) entry.getKey();
-                if (!names.isEmpty() && !names.contains(unit)) continue;
+                String name = (String) entry.getKey();
+                if (!names.isEmpty() && !names.contains(name)) continue;
                 String className = (String) entry.getValue();
                 Class<? extends Interceptor> clazz = Class.forName(className).asSubclass(Interceptor.class);
                 Interceptor interceptor = clazz.newInstance();

@@ -3,6 +3,7 @@ package io.fileman;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -67,6 +68,10 @@ public abstract class Toolkit {
             if (iterator.hasNext()) joined.append(delimit);
         }
         return joined.toString();
+    }
+
+    public static String join(Object[] array, String delimit) {
+        return join(Arrays.asList(array), delimit);
     }
 
     public static String quote(String value) {
