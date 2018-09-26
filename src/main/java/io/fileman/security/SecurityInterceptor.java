@@ -32,7 +32,7 @@ public class SecurityInterceptor implements Interceptor, Initialable, Filter {
     @Override
     public void initialize(Configuration configuration) throws Exception {
         String location = configuration.valueOf("security-config-location");
-        if (Toolkit.isBlank(location)) location = "fileman-security.xml";
+        if (Toolkit.isBlank(location)) location = "fileman/security.xml";
         String[] locations = location.split(SPLIT_DELIMIT_REGEX);
         ClassLoader classLoader = this.getClass().getClassLoader();
         for (String config : locations) {
