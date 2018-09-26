@@ -13,6 +13,8 @@ import java.util.List;
  * 2018/9/25
  */
 public class Resource extends Node {
+    private static final AntMatcher MATCHER = new AntMatcher();
+
     private final String name;
     private final List<String> methods;
     private final List<String> paths;
@@ -35,7 +37,9 @@ public class Resource extends Node {
 
     @Override
     public boolean matches(String method, String path) {
-        return (methods.isEmpty() || methods.contains(method.toUpperCase())) && paths.contains(path);
+        if (!methods.isEmpty() && !methods.contains(method.toUpperCase())) return false;
+        for (String pattern : paths) if (MATCHER.match(pattern, path)) return true;
+        return false;
     }
 
     public String getName() {

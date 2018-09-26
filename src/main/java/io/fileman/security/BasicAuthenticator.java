@@ -40,7 +40,7 @@ public class BasicAuthenticator implements Authenticator {
         String method = request.getMethod();
         File root = context.getRoot();
         String path = root.toURI().relativize(file.toURI()).toString();
-        if (path.isEmpty()) path = "/";
+        if (!path.startsWith("/")) path = "/" + path;
         if (!user.matches(method, path)) throw new ForbiddenSecurityException();
     }
 
