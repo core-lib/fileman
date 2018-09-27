@@ -25,12 +25,12 @@ public class LinesExtractor implements Extractor {
     @Override
     public void extract(File file, Range range, ExtractContext context) throws IOException {
         long start = range.getStart();
-        long end = range.getEnd() > 0 ? range.getEnd() : Long.MAX_VALUE;
+        long end = range.getEnd();
         long total = Toolkit.lines(file);
-        long first = start > 0 ? start : 0;
+        long first = Math.abs(start);
         long last = Math.min(end, total - 1);
         HttpServletResponse response = context.getResponse();
-        if (first >= last) {
+        if (first > last) {
             response.sendError(HttpURLConnection.HTTP_NO_CONTENT, "No Content");
             return;
         }
