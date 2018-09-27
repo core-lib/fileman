@@ -39,6 +39,15 @@ public class FilemanServletRegistrar implements ImportBeanDefinitionRegistrar {
         Class<?> servlet = attributes.getClass("servlet");
         fileman.getPropertyValues().add("servlet", newInstance(servlet));
 
+        boolean async = attributes.getBoolean("async");
+        fileman.getPropertyValues().add("asyncSupported", async);
+
+        boolean enabled = attributes.getBoolean("enabled");
+        fileman.getPropertyValues().add("enabled", enabled);
+
+        int load = attributes.getNumber("load");
+        fileman.getPropertyValues().add("loadOnStartup", load);
+
         AnnotationAttributes multipart = attributes.getAnnotation("multipart");
         String location = multipart.getString("location");
         long maxFileSize = multipart.getNumber("maxFileSize").longValue();
@@ -68,7 +77,8 @@ public class FilemanServletRegistrar implements ImportBeanDefinitionRegistrar {
 
         fileman.getPropertyValues().add("initParameters", parameters);
 
-        registry.registerBeanDefinition("fileman", fileman);
+        String beanName = attributes.getString("bean");
+        registry.registerBeanDefinition(beanName, fileman);
     }
 
     private <T> T newInstance(Class<T> clazz) {

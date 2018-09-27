@@ -52,8 +52,6 @@ public class FilemanWebSupport implements Interceptor {
 
     private void initConverters(Configuration configuration) throws IOException, ServletException {
         converters.clear();
-        String fields = configuration.valueOf("fields");
-        String[] columns = fields.split(SPLIT_DELIMIT_REGEX);
         Collection<Resource> resources = SimpleDetector.Builder
                 .scan("fileman")
                 .includeJar()
@@ -65,6 +63,8 @@ public class FilemanWebSupport implements Interceptor {
             InputStream in = resource.getInputStream();
             properties.load(in);
         }
+        String fields = configuration.valueOf("fields");
+        Iterable<String> columns = Toolkit.isBlank(fields) ? properties.stringPropertyNames() : Arrays.asList(fields.split(SPLIT_DELIMIT_REGEX));
         for (String column : columns) {
             String className = properties.getProperty(column);
             if (className == null) className = column;
@@ -93,16 +93,15 @@ public class FilemanWebSupport implements Interceptor {
             properties.load(in);
         }
         String ranges = configuration.valueOf("ranges");
-        List<String> units = Toolkit.isBlank(ranges) ? Collections.<String>emptyList() : Arrays.asList(ranges.split(SPLIT_DELIMIT_REGEX));
-        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+        Iterable<String> units = Toolkit.isBlank(ranges) ? properties.stringPropertyNames() : Arrays.asList(ranges.split(SPLIT_DELIMIT_REGEX));
+        for (String unit : units) {
             try {
-                String unit = (String) entry.getKey();
-                if (!units.isEmpty() && !units.contains(unit)) continue;
-                String className = (String) entry.getValue();
+                String className = properties.getProperty(unit);
+                if (className == null) className = unit;
                 Class<? extends Extractor> clazz = Class.forName(className).asSubclass(Extractor.class);
                 Extractor extractor = clazz.newInstance();
                 if (extractor instanceof Initialable) ((Initialable) extractor).initialize(configuration);
-                extractors.put(unit, extractor);
+                extractors.add(extractor);
             } catch (Exception e) {
                 throw new ServletException(e);
             }
@@ -123,7 +122,7 @@ public class FilemanWebSupport implements Interceptor {
             properties.load(in);
         }
         String value = configuration.valueOf("interceptors");
-        List<String> names = Toolkit.isBlank(value) ? Collections.<String>emptyList() : Arrays.asList(value.split(SPLIT_DELIMIT_REGEX));
+        Iterable<String> names = Toolkit.isBlank(value) ? Collections.<String>emptyList() : Arrays.asList(value.split(SPLIT_DELIMIT_REGEX));
         for (String name : names) {
             try {
                 String className = properties.getProperty(name);
@@ -216,7 +215,9 @@ public class FilemanWebSupport implements Interceptor {
         // 是文件
         else if (file.isFile()) {
             String range = request.getHeader("Range");
-            response.setHeader("Accept-Ranges", Toolkit.join(extractors.keySet(), ", "));
+            List<String> units = new ArrayList<>();
+            for (Extractor extractor : extractors) units.add(extractor.unit());
+            response.setHeader("Accept-Ranges", Toolkit.join(units, ", "));
             // 全部读取
             if (Toolkit.isBlank(range)) {
                 Path path = Paths.get(file.toURI());
@@ -243,7 +244,7 @@ public class FilemanWebSupport implements Interceptor {
             else {
                 Range r = Range.valueOf(range);
                 Extractor extractor = null;
-                for (Extractor e : extractors) if (e.supports(file, r)) extractor = e;
+                for (Extractor e : extractors) if (r.getUnit().equals(e.unit())) extractor = e;
                 if (extractor == null) response.sendError(HttpURLConnection.HTTP_NOT_IMPLEMENTED, "Not Implemented");
                 else extractor.extract(file, r, new ExtractContext(new File(root), configuration, request, response));
             }

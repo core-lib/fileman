@@ -34,7 +34,12 @@ public @interface EnableFileman {
     String name() default "fileman";
 
     /**
-     * @return URL patterns
+     * @return Bean name
+     */
+    String bean() default "fileman";
+
+    /**
+     * @return URL mappings
      */
     String[] mappings() default {"/fileman/*"};
 
@@ -49,6 +54,21 @@ public @interface EnableFileman {
     int order() default Integer.MAX_VALUE;
 
     /**
+     * @return Servlet async supported
+     */
+    boolean async() default true;
+
+    /**
+     * @return Servlet enabled
+     */
+    boolean enabled() default true;
+
+    /**
+     * @return load on startup
+     */
+    int load() default -1;
+
+    /**
      * @return Download buffer size
      */
     int buffer() default 1024 * 8;
@@ -56,17 +76,17 @@ public @interface EnableFileman {
     /**
      * @return File fields
      */
-    String[] fields() default {"name", "size", "type", "etag"};
+    String[] fields() default {};
 
     /**
      * @return Download range units
      */
-    String[] ranges() default {"bytes"};
+    String[] ranges() default {};
 
     /**
      * @return Interceptor names
      */
-    String[] interceptors() default {"security"};
+    String[] interceptors() default {};
 
     /**
      * @return File properties synthesizer
