@@ -1,5 +1,5 @@
 <security version="1.0">
     <resource name="all" method="*" path="/**"/>
-    <role name="administrator" resources="all"/>
-    <user name="admin" password="admin" roles="administrator"/>
+    <role name="admin" resources="all"/>
+    <user name="fileman" password="fileman" roles="admin"/>
 </security>
