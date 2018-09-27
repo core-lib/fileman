@@ -22,8 +22,6 @@ public class Range {
 
     public Range(String unit, long start, long end) {
         if (unit == null) throw new NullPointerException();
-        if (start < 0 || end < 0) throw new IllegalArgumentException("index must not be negative");
-        if (start > end && end > 0) throw new IllegalArgumentException("start index must not bigger than end index");
         this.unit = unit;
         this.start = start;
         this.end = end;
@@ -43,7 +41,7 @@ public class Range {
         }
         String first = range.substring(0, idx);
         String last = range.substring(idx + 1);
-        long start = first.isEmpty() ? 0L : Long.valueOf(first);
+        long start = first.isEmpty() ? -1L : Long.valueOf(first);
         long end = last.isEmpty() ? Long.MAX_VALUE : Long.valueOf(last);
         return new Range(unit, start, end);
     }
@@ -62,6 +60,6 @@ public class Range {
 
     @Override
     public String toString() {
-        return unit + "=" + (start > 0 ? start : "") + "-" + (end < Long.MAX_VALUE ? end : "");
+        return unit + "=" + (start >= 0 ? start : "") + "-" + (end < Long.MAX_VALUE ? end : "");
     }
 }

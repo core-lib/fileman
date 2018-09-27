@@ -33,8 +33,8 @@ public class BytesExtractor implements Extractor {
             long start = range.getStart();
             long end = range.getEnd();
             long total = raf.length();
-            long first = Math.abs(start);
-            long last = Math.min(end, total - 1);
+            long first = start < 0 ? total < end ? 0 : total - end : start;
+            long last = start < 0 ? total - 1 : Math.min(end, total - 1);
             long length = last - first + 1;
             HttpServletResponse response = context.getResponse();
             if (length <= 0) {
