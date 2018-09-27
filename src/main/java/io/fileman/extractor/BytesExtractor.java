@@ -1,4 +1,9 @@
-package io.fileman;
+package io.fileman.extractor;
+
+import io.fileman.ExtractContext;
+import io.fileman.Extractor;
+import io.fileman.Range;
+import io.fileman.Toolkit;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -26,11 +31,11 @@ public class BytesExtractor implements Extractor {
         try {
             raf = new RandomAccessFile(file, "rws");
             long start = range.getStart();
-            long end = range.getEnd() > 0 ? range.getEnd() : Long.MAX_VALUE;
+            long end = range.getEnd();
             long total = raf.length();
-            long first = start > 0 ? start : 0;
+            long first = Math.abs(start);
             long last = Math.min(end, total - 1);
-            long length = last - first;
+            long length = last - first + 1;
             HttpServletResponse response = context.getResponse();
             if (length <= 0) {
                 response.sendError(HttpURLConnection.HTTP_NO_CONTENT, "No Content");

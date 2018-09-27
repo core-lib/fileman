@@ -44,7 +44,7 @@ public class Range {
         String first = range.substring(0, idx);
         String last = range.substring(idx + 1);
         long start = first.isEmpty() ? 0L : Long.valueOf(first);
-        long end = last.isEmpty() ? 0L : Long.valueOf(last);
+        long end = last.isEmpty() ? Long.MAX_VALUE : Long.valueOf(last);
         return new Range(unit, start, end);
     }
 
@@ -62,6 +62,6 @@ public class Range {
 
     @Override
     public String toString() {
-        return unit + "=" + (start > 0 ? start : "") + "-" + (end > 0 ? end : "");
+        return unit + "=" + (start > 0 ? start : "") + "-" + (end < Long.MAX_VALUE ? end : "");
     }
 }

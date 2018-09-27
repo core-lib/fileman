@@ -1,8 +1,6 @@
 package io.fileman;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -98,6 +96,24 @@ public abstract class Toolkit {
             if (bean instanceof Releasable) ((Releasable) bean).release();
         } catch (Exception e) {
             // do nothing
+        }
+    }
+
+    public static int lines(String filepath) throws IOException {
+        return lines(new File(filepath));
+    }
+
+    public static int lines(File file) throws IOException {
+        FileReader fr = null;
+        LineNumberReader lnr = null;
+        try {
+            fr = new FileReader(file);
+            lnr = new LineNumberReader(fr);
+            while (lnr.readLine() != null) lnr.getLineNumber();
+            return lnr.getLineNumber();
+        } finally {
+            close(lnr);
+            close(fr);
         }
     }
 
