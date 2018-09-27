@@ -15,12 +15,12 @@ import java.lang.annotation.*;
 public @interface Param {
 
     /**
-     * @return Filter Init Parameter Name
+     * @return Servlet Init Parameter Name
      */
     String name();
 
     /**
-     * @return Filter Init Parameter Value
+     * @return Servlet Init Parameter Value
      */
     String value();
 

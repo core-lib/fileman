@@ -86,7 +86,7 @@ public @interface EnableFileman {
     /**
      * @return Interceptor names
      */
-    String[] interceptors() default {};
+    String[] interceptors() default {"security"};
 
     /**
      * @return File properties synthesizer

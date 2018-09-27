@@ -49,16 +49,12 @@ public class FilemanServletRegistrar implements ImportBeanDefinitionRegistrar {
         fileman.getPropertyValues().add("loadOnStartup", load);
 
         AnnotationAttributes multipart = attributes.getAnnotation("multipart");
-        String location = multipart.getString("location");
-        long maxFileSize = multipart.getNumber("maxFileSize").longValue();
-        long maxRequestSize = multipart.getNumber("maxRequestSize").longValue();
-        int fileSizeThreshold = multipart.getNumber("fileSizeThreshold").intValue();
-        if (!location.isEmpty() || maxFileSize >= 0L || maxRequestSize >= 0L || fileSizeThreshold >= 0) {
+        if (multipart.getBoolean("enabled")) {
             MultipartConfigElement multipartConfig = new MultipartConfigElement(
-                    location,
-                    maxFileSize,
-                    maxRequestSize,
-                    fileSizeThreshold
+                    multipart.getString("location"),
+                    multipart.getNumber("maxFileSize").longValue(),
+                    multipart.getNumber("maxRequestSize").longValue(),
+                    multipart.getNumber("fileSizeThreshold").intValue()
             );
             fileman.getPropertyValues().add("multipartConfig", multipartConfig);
         }
