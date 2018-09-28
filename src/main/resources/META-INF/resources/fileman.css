@@ -1,0 +1,23 @@
+.page {
+    min-width: 24px;
+    height: 24px;
+    border: 1px solid silver;
+    background-color: white;
+    margin: 2px;
+    cursor: pointer;
+}
+
+.page.current {
+    cursor: default;
+    background-color: silver;
+}
+
+.page:hover {
+    background-color: silver;
+}
+
+.page-size {
+    width: 36px;
+    height: 18px;
+    margin: 2px;
+}

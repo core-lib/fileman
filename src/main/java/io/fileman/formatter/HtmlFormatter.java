@@ -5,6 +5,7 @@ import io.fileman.FormatContext;
 import io.fileman.Formatter;
 import io.fileman.Toolkit;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -24,6 +25,8 @@ public class HtmlFormatter implements Formatter {
 
     @Override
     public void format(Fileman fileman, FormatContext context) throws IOException {
+        HttpServletRequest request = context.getRequest();
+        String contextPath = request.getContextPath();
         HttpServletResponse response = context.getResponse();
         response.setContentType("text/html");
         OutputStream out = response.getOutputStream();
@@ -33,6 +36,7 @@ public class HtmlFormatter implements Formatter {
 
         pw.println("<html>");
         pw.println("<head>");
+        pw.println("    <link rel=\"Shortcut Icon\" href=\"" + contextPath + "/fileman.ico\">");
         pw.println("    <title>Index of " + path + "</title>");
         pw.println("    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>");
         pw.println("</head>");

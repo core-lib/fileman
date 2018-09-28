@@ -139,6 +139,8 @@ public class FilemanWebSupport implements Interceptor {
     }
 
     protected void handle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
         String requestPath = request.getRequestURI();
         String contextPath = request.getContextPath();
         String servletPath = request.getServletPath();
