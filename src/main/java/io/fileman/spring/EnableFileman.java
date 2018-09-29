@@ -26,7 +26,7 @@ public @interface EnableFileman {
     /**
      * @return Fileman root folder
      */
-    String value();
+    String root() default "";
 
     /**
      * @return Servlet name
@@ -41,7 +41,7 @@ public @interface EnableFileman {
     /**
      * @return URL mappings
      */
-    String[] mappings() default {"/fileman/*"};
+    String[] value() default {"/fileman/*"};
 
     /**
      * @return Filter Class
@@ -56,7 +56,7 @@ public @interface EnableFileman {
     /**
      * @return Servlet async supported
      */
-    boolean async() default true;
+    boolean asyncSupported() default true;
 
     /**
      * @return Servlet enabled
@@ -66,7 +66,7 @@ public @interface EnableFileman {
     /**
      * @return load on startup
      */
-    int load() default -1;
+    int loadOnStartup() default -1;
 
     /**
      * @return Download buffer size
@@ -106,6 +106,6 @@ public @interface EnableFileman {
     /**
      * @return Multipart config
      */
-    Multipart multipart() default @Multipart;
+    Multipart multipart() default @Multipart(enabled = false);
 
 }

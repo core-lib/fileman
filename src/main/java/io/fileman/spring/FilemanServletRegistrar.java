@@ -33,19 +33,19 @@ public class FilemanServletRegistrar implements ImportBeanDefinitionRegistrar {
         int order = attributes.getNumber("order");
         fileman.getPropertyValues().add("order", order);
 
-        String[] mappings = attributes.getStringArray("mappings");
-        fileman.getPropertyValues().add("urlMappings", Arrays.asList(mappings));
+        String[] values = attributes.getStringArray("value");
+        fileman.getPropertyValues().add("urlMappings", Arrays.asList(values));
 
         Class<?> servlet = attributes.getClass("servlet");
         fileman.getPropertyValues().add("servlet", newInstance(servlet));
 
-        boolean async = attributes.getBoolean("async");
+        boolean async = attributes.getBoolean("asyncSupported");
         fileman.getPropertyValues().add("asyncSupported", async);
 
         boolean enabled = attributes.getBoolean("enabled");
         fileman.getPropertyValues().add("enabled", enabled);
 
-        int load = attributes.getNumber("load");
+        int load = attributes.getNumber("loadOnStartup");
         fileman.getPropertyValues().add("loadOnStartup", load);
 
         AnnotationAttributes multipart = attributes.getAnnotation("multipart");
@@ -63,7 +63,7 @@ public class FilemanServletRegistrar implements ImportBeanDefinitionRegistrar {
         AnnotationAttributes[] params = attributes.getAnnotationArray("params");
         for (AnnotationAttributes param : params) parameters.put(param.getString("name"), param.getString("value"));
 
-        parameters.put("root", attributes.getString("value"));
+        parameters.put("root", attributes.getString("root"));
         parameters.put("buffer", attributes.getNumber("buffer").toString());
         parameters.put("fields", Toolkit.join(attributes.getStringArray("fields"), ","));
         parameters.put("ranges", Toolkit.join(attributes.getStringArray("ranges"), ","));
