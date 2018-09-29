@@ -8,7 +8,7 @@ import io.fileman.Formatter;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.PrintWriter;
 
 /**
  * JSON格式化器
@@ -23,7 +23,7 @@ public class YamlFormatter implements Formatter {
     public void format(Fileman fileman, FormatContext context) throws IOException {
         HttpServletResponse response = context.getResponse();
         response.setContentType("application/yaml");
-        OutputStream out = response.getOutputStream();
+        PrintWriter out = response.getWriter();
         writer.writeValue(out, fileman);
     }
 

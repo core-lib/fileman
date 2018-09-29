@@ -8,6 +8,10 @@ import io.fileman.Toolkit;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * 按行内容提取器
@@ -36,12 +40,19 @@ public class LinesExtractor implements Extractor {
         }
         response.setStatus(HttpURLConnection.HTTP_PARTIAL);
         response.setHeader("Content-Range", "lines " + first + "-" + last + "/" + total);
+        Path path = Paths.get(file.toURI());
+        String contentType = Files.probeContentType(path);
+        if (contentType == null) contentType = "text/plain";
+        response.setContentType(contentType);
+
         PrintWriter writer = response.getWriter();
-        FileReader fr = null;
+        FileInputStream fis = null;
+        InputStreamReader isr = null;
         LineNumberReader lnr = null;
         try {
-            fr = new FileReader(file);
-            lnr = new LineNumberReader(fr);
+            fis = new FileInputStream(file);
+            isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+            lnr = new LineNumberReader(isr);
             String line;
             int index = 0;
             while ((line = lnr.readLine()) != null) {
@@ -52,7 +63,8 @@ public class LinesExtractor implements Extractor {
             writer.flush();
         } finally {
             Toolkit.close(lnr);
-            Toolkit.close(fr);
+            Toolkit.close(isr);
+            Toolkit.close(fis);
         }
     }
 

@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * 字节范围文件内容提取器
@@ -43,6 +46,10 @@ public class BytesExtractor implements Extractor {
             }
             response.setStatus(HttpURLConnection.HTTP_PARTIAL);
             response.setHeader("Content-Range", "bytes " + first + "-" + last + "/" + total);
+            Path path = Paths.get(file.toURI());
+            String contentType = Files.probeContentType(path);
+            if (contentType == null) contentType = "application/octet-stream";
+            response.setContentType(contentType);
             OutputStream out = response.getOutputStream();
             raf.seek(first);
             byte[] buf = new byte[1024 * 8];

@@ -8,8 +8,6 @@ import io.fileman.Toolkit;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
@@ -29,16 +27,14 @@ public class HtmlFormatter implements Formatter {
         String contextPath = request.getContextPath();
         HttpServletResponse response = context.getResponse();
         response.setContentType("text/html");
-        OutputStream out = response.getOutputStream();
-        OutputStreamWriter osw = new OutputStreamWriter(out);
-        PrintWriter pw = new PrintWriter(osw);
+        PrintWriter pw = response.getWriter();
         String path = Toolkit.ifEmpty(fileman.getPath(), "/");
 
         pw.println("<html>");
         pw.println("<head>");
         pw.println("    <link rel=\"Shortcut Icon\" href=\"" + contextPath + "/fileman.ico\">");
         pw.println("    <title>Index of " + path + "</title>");
-        pw.println("    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>");
+        pw.println("    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>");
         pw.println("</head>");
         pw.println("<body>");
         pw.println("<h1>Index of " + path + "</h1>");
@@ -68,6 +64,5 @@ public class HtmlFormatter implements Formatter {
         pw.println("</body>");
         pw.println("</html>");
         pw.flush();
-        osw.flush();
     }
 }
