@@ -4,7 +4,7 @@ function Fileman() {
 
     var fileURI = window.location.hash.substring(1);
     var pageNo = 0;
-    var pageSize = 36;
+    var pageSize = parseInt((window.innerHeight - 64) / 16);
 
     this.init = function () {
         if (!fileURI) return;
@@ -50,6 +50,15 @@ function Fileman() {
         this.load(fileURI, _pageNo, pageSize, this.onXHRStateChanged);
     };
 
+    this.onPageSizeChanged = function (input) {
+        var _pageSize = parseInt(input.value);
+        if (_pageSize >= 0) {
+            this.load(fileURI, 0, _pageSize, this.onXHRStateChanged);
+        } else {
+            alert("Please input a positive number");
+        }
+    };
+
     this.onXHRStateChanged = function () {
         if (xhr.readyState !== 4) return;
 
@@ -77,6 +86,7 @@ function Fileman() {
                 }
             }
             html += '<button type="button" class="page" onclick="fileman.next();"' + (pageNo === (pages - 1) ? 'disabled' : '') + '>Next</button>\n';
+            html += '<input class="page-size" onblur="fileman.onPageSizeChanged(this);" placeholder="lines" value="' + pageSize + '" />\n';
 
             document.getElementById("pagination").innerHTML = html;
         }
