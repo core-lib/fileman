@@ -4,10 +4,12 @@ function Fileman() {
 
     var fileURI = window.location.hash.substring(1);
     var pageNo = 0;
-    var pageSize = parseInt((window.innerHeight - 64) / 16);
+    var pageSize = 48;
 
     this.init = function () {
         if (!fileURI) return;
+        var lines = parseInt((window.innerHeight - 72) / 16);
+        if (lines > 0) pageSize = lines;
         document.title = "Fileman - " + fileURI;
         this.load(fileURI, pageNo, pageSize, this.onXHRStateChanged);
     };
