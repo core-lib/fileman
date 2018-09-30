@@ -32,7 +32,7 @@ function Fileman() {
             xhr.onreadystatechange = _onXHRStateChanged;
             xhr.open("GET", fileURI, true);
             var start = pageNo * pageSize;
-            var end = (pageNo + 1) * pageSize;
+            var end = (pageNo + 1) * pageSize - 1;
             xhr.setRequestHeader("Range", "lines=" + start + "-" + end);
             xhr.send(null);
         } else {
