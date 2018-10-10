@@ -21,10 +21,6 @@
             <id>jitpack.io</id>
             <url>https://www.jitpack.io</url>
         </repository>
-        <repository>
-            <id>Nuiton</id>
-            <url>http://maven.nuiton.org/release/</url>
-        </repository>
     </repositories>
 
     <dependencies>
