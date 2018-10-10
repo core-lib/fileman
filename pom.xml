@@ -6,7 +6,7 @@
 
     <groupId>io.fileman</groupId>
     <artifactId>fileman</artifactId>
-    <version>v1.0.7</version>
+    <version>v1.0.8</version>
     <packaging>jar</packaging>
     <name>fileman</name>
 
@@ -78,11 +78,6 @@
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.11</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.cpdetector</groupId>
-            <artifactId>cpdetector</artifactId>
-            <version>1.0.7</version>
         </dependency>
     </dependencies>
 

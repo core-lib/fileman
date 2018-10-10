@@ -1,6 +1,5 @@
 package io.fileman.extractor;
 
-import info.monitorenter.cpdetector.io.*;
 import io.fileman.ExtractContext;
 import io.fileman.Extractor;
 import io.fileman.Range;
@@ -21,16 +20,6 @@ import java.nio.file.Paths;
  * 2018/9/27
  */
 public class LinesExtractor implements Extractor {
-    private final ICodepageDetector detector;
-
-    public LinesExtractor() {
-        CodepageDetectorProxy detector = CodepageDetectorProxy.getInstance();
-        detector.add(new ParsingDetector(false));
-        detector.add(JChardetFacade.getInstance());
-        detector.add(ASCIIDetector.getInstance());
-        detector.add(UnicodeDetector.getInstance());
-        this.detector = detector;
-    }
 
     @Override
     public String unit() {
@@ -61,10 +50,9 @@ public class LinesExtractor implements Extractor {
         InputStreamReader isr = null;
         LineNumberReader lnr = null;
         try {
-            Charset charset = detector.detectCodepage(file.toURI().toURL());
-
+            String charset = Toolkit.charsetOf(file);
             fis = new FileInputStream(file);
-            isr = new InputStreamReader(fis, charset != null ? charset : Charset.defaultCharset());
+            isr = new InputStreamReader(fis, charset != null ? charset : Charset.defaultCharset().name());
             lnr = new LineNumberReader(isr);
             String line;
             int index = 0;

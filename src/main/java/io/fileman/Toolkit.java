@@ -117,4 +117,55 @@ public abstract class Toolkit {
         }
     }
 
+    public static String charsetOf(File file) throws IOException {
+        String charset = "GBK";
+        byte[] first = new byte[3];
+        boolean checked = false;
+        FileInputStream fis = null;
+        BufferedInputStream bis = null;
+        try {
+            fis = new FileInputStream(file);
+            bis = new BufferedInputStream(fis);
+            bis.mark(0);
+            int read = bis.read(first, 0, 3);
+            if (read == -1) return charset;
+            if (first[0] == (byte) 0xFF && first[1] == (byte) 0xFE) {
+                charset = "UTF-16LE";
+                checked = true;
+            } else if (first[0] == (byte) 0xFE && first[1] == (byte) 0xFF) {
+                charset = "UTF-16BE";
+                checked = true;
+            } else if (first[0] == (byte) 0xEF && first[1] == (byte) 0xBB && first[2] == (byte) 0xBF) {
+                charset = "UTF-8";
+                checked = true;
+            }
+            bis.reset();
+            if (!checked) {
+                while ((read = bis.read()) != -1) {
+                    if (read >= 0xF0) break;
+                    if (0x80 <= read && read <= 0xBF) // 单独出现BF以下的，也算是GBK
+                        break;
+                    if (0xC0 <= read && read <= 0xDF) {
+                        read = bis.read();
+                        if (0x80 <= read && read <= 0xBF) continue;// 双字节 (0xC0 - 0xDF) (0x80  - 0xBF),也可能在GB编码内
+                        else break;
+                    } else if (0xE0 <= read && read <= 0xEF) {// 也有可能出错，但是几率较小
+                        read = bis.read();
+                        if (0x80 <= read && read <= 0xBF) {
+                            read = bis.read();
+                            if (0x80 <= read && read <= 0xBF) {
+                                charset = "UTF-8";
+                                break;
+                            } else break;
+                        } else break;
+                    }
+                }
+            }
+        } finally {
+            close(bis);
+            close(fis);
+        }
+        return charset;
+    }
+
 }
