@@ -119,7 +119,7 @@ public abstract class Toolkit {
 
     public static String charsetOf(File file) throws IOException {
         String charset = "GBK";
-        byte[] first = new byte[3];
+        byte[] head = new byte[3];
         boolean checked = false;
         FileInputStream fis = null;
         BufferedInputStream bis = null;
@@ -127,15 +127,15 @@ public abstract class Toolkit {
             fis = new FileInputStream(file);
             bis = new BufferedInputStream(fis);
             bis.mark(0);
-            int read = bis.read(first, 0, 3);
+            int read = bis.read(head, 0, 3);
             if (read == -1) return charset;
-            if (first[0] == (byte) 0xFF && first[1] == (byte) 0xFE) {
+            if (head[0] == (byte) 0xFF && head[1] == (byte) 0xFE) {
                 charset = "UTF-16LE";
                 checked = true;
-            } else if (first[0] == (byte) 0xFE && first[1] == (byte) 0xFF) {
+            } else if (head[0] == (byte) 0xFE && head[1] == (byte) 0xFF) {
                 charset = "UTF-16BE";
                 checked = true;
-            } else if (first[0] == (byte) 0xEF && first[1] == (byte) 0xBB && first[2] == (byte) 0xBF) {
+            } else if (head[0] == (byte) 0xEF && head[1] == (byte) 0xBB && head[2] == (byte) 0xBF) {
                 charset = "UTF-8";
                 checked = true;
             }
