@@ -6,7 +6,7 @@
 
     <groupId>io.fileman</groupId>
     <artifactId>fileman</artifactId>
-    <version>v1.0.6</version>
+    <version>v1.0.7</version>
     <packaging>jar</packaging>
     <name>fileman</name>
 
@@ -20,6 +20,10 @@
         <repository>
             <id>jitpack.io</id>
             <url>https://www.jitpack.io</url>
+        </repository>
+        <repository>
+            <id>Nuiton</id>
+            <url>http://maven.nuiton.org/release/</url>
         </repository>
     </repositories>
 
@@ -74,6 +78,11 @@
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.11</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.cpdetector</groupId>
+            <artifactId>cpdetector</artifactId>
+            <version>1.0.7</version>
         </dependency>
     </dependencies>
 

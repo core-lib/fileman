@@ -1,5 +1,6 @@
 package io.fileman.extractor;
 
+import info.monitorenter.cpdetector.io.*;
 import io.fileman.ExtractContext;
 import io.fileman.Extractor;
 import io.fileman.Range;
@@ -8,7 +9,7 @@ import io.fileman.Toolkit;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,6 +21,16 @@ import java.nio.file.Paths;
  * 2018/9/27
  */
 public class LinesExtractor implements Extractor {
+    private final ICodepageDetector detector;
+
+    public LinesExtractor() {
+        CodepageDetectorProxy detector = CodepageDetectorProxy.getInstance();
+        detector.add(new ParsingDetector(false));
+        detector.add(JChardetFacade.getInstance());
+        detector.add(ASCIIDetector.getInstance());
+        detector.add(UnicodeDetector.getInstance());
+        this.detector = detector;
+    }
 
     @Override
     public String unit() {
@@ -50,8 +61,10 @@ public class LinesExtractor implements Extractor {
         InputStreamReader isr = null;
         LineNumberReader lnr = null;
         try {
+            Charset charset = detector.detectCodepage(file.toURI().toURL());
+
             fis = new FileInputStream(file);
-            isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
+            isr = new InputStreamReader(fis, charset != null ? charset : Charset.defaultCharset());
             lnr = new LineNumberReader(isr);
             String line;
             int index = 0;
