@@ -345,10 +345,10 @@ public class FilemanWebSupport implements Interceptor {
 
     static class ConverterConfigFilter implements Filter {
         private final List<String> names = Arrays.asList(
-                "converter.properties",
-                "resolver.properties",
-                "renderer.properties",
-                "adapter.properties"
+                "fileman/converter.properties",
+                "fileman/resolver.properties",
+                "fileman/renderer.properties",
+                "fileman/adapter.properties"
         );
 
         @Override
@@ -361,7 +361,7 @@ public class FilemanWebSupport implements Interceptor {
 
         @Override
         public boolean accept(Resource resource, FilterChain chain) {
-            return "extractor.properties".equals(resource.getName()) && chain.doNext(resource);
+            return "fileman/extractor.properties".equals(resource.getName()) && chain.doNext(resource);
         }
     }
 
@@ -369,7 +369,7 @@ public class FilemanWebSupport implements Interceptor {
 
         @Override
         public boolean accept(Resource resource, FilterChain chain) {
-            return "interceptor.properties".equals(resource.getName()) && chain.doNext(resource);
+            return "fileman/interceptor.properties".equals(resource.getName()) && chain.doNext(resource);
         }
     }
 }
