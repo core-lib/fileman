@@ -127,6 +127,6 @@ public class SecurityInterceptor implements Interceptor, Initialable, Filter {
 
     @Override
     public boolean accept(io.detector.Resource resource, FilterChain chain) {
-        return "authenticator.properties".equals(resource.getName()) && chain.doNext(resource);
+        return "fileman/authenticator.properties".equals(resource.getName()) && chain.doNext(resource);
     }
 }
