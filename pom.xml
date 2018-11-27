@@ -6,7 +6,7 @@
 
     <groupId>io.fileman</groupId>
     <artifactId>fileman</artifactId>
-    <version>v1.1.2</version>
+    <version>v1.1.3</version>
     <packaging>jar</packaging>
     <name>fileman</name>
 
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>com.github.core-lib</groupId>
             <artifactId>detector</artifactId>
-            <version>v1.0.4</version>
+            <version>v1.1.0</version>
         </dependency>
         <dependency>
             <groupId>dom4j</groupId>
