@@ -4,7 +4,6 @@ import io.fileman.Adapter;
 import io.fileman.RenderContext;
 import io.fileman.ResolveContext;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 
 /**
@@ -23,13 +22,7 @@ public class NameAdapter extends Adapter {
     @Override
     public Object render(File file, RenderContext context) {
         Object name = resolve(file, new ResolveContext(context));
-        HttpServletRequest request = context.getRequest();
-        String contextPath = request.getContextPath();
-        String servletPath = request.getServletPath();
-        File root = context.getRoot();
-        String filemanPath = root.toURI().relativize(file.toURI()).toString();
-        String URI = ("/" + contextPath + "/" + servletPath + "/" + filemanPath).replaceAll("/+", "/");
-        return "<a href=\"" + URI + "\">" + name + "</a>";
+        return "<a href=\"./" + name + "\">" + name + "</a>";
     }
 
     @Override

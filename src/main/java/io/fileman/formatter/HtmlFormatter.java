@@ -24,8 +24,16 @@ public class HtmlFormatter implements Formatter {
     @Override
     public void format(Fileman fileman, FormatContext context) throws IOException {
         HttpServletRequest request = context.getRequest();
-        String contextPath = request.getContextPath();
         HttpServletResponse response = context.getResponse();
+
+        String requestPath = request.getRequestURI();
+        // 如果路径后面没有 / 则重定向到以 / 结尾的路径上
+        if (!requestPath.endsWith("/")) {
+            response.sendRedirect("./" + requestPath.substring(requestPath.lastIndexOf('/') + 1) + "/");
+            return;
+        }
+
+        String contextPath = request.getContextPath();
         response.setContentType("text/html");
         PrintWriter pw = response.getWriter();
         String path = Toolkit.ifEmpty(fileman.getPath(), "/");

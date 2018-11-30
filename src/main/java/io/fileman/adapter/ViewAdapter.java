@@ -34,11 +34,17 @@ public class ViewAdapter extends Adapter {
     @Override
     public Object resolve(File file, ResolveContext context) {
         if (file.isDirectory()) return "";
-        HttpServletRequest request = context.getRequest();
-        String contextPath = request.getContextPath();
-        String servletPath = request.getServletPath();
         File root = context.getRoot();
         String filemanPath = root.toURI().relativize(file.toURI()).toString();
-        return ("/" + contextPath + "/fileman.html#" + "/" + contextPath + "/" + servletPath + "/" + filemanPath).replaceAll("/+", "/");
+        int length = filemanPath.split("/+").length;
+        StringBuilder path = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            path.append("../");
+        }
+        path.append("fileman.html");
+        HttpServletRequest request = context.getRequest();
+        String servletPath = request.getServletPath();
+        String hash = "./" + servletPath + "/" + filemanPath;
+        return (path + "#" + hash).replaceAll("/+", "/");
     }
 }
