@@ -33,14 +33,19 @@ public class HtmlFormatter implements Formatter {
             return;
         }
 
-        String contextPath = request.getContextPath();
         response.setContentType("text/html");
         PrintWriter pw = response.getWriter();
         String path = Toolkit.ifEmpty(fileman.getPath(), "/");
 
+        int length = fileman.getPath().split("/+").length;
+        StringBuilder parents = new StringBuilder();
+        for (int i = 0; i < length; i++) {
+            parents.append("../");
+        }
+
         pw.println("<html>");
         pw.println("<head>");
-        pw.println("    <link rel=\"Shortcut Icon\" href=\"" + contextPath + "/fileman.ico\">");
+        pw.println("    <link rel=\"Shortcut Icon\" href=\"" + parents + "fileman.ico\">");
         pw.println("    <title>Index of " + path + "</title>");
         pw.println("    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>");
         pw.println("</head>");
