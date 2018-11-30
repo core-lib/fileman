@@ -1,0 +1,6 @@
+io.fileman.adapter.NameAdapter
+io.fileman.adapter.SizeAdapter
+io.fileman.adapter.TimeAdapter
+io.fileman.adapter.TypeAdapter
+io.fileman.adapter.ETagAdapter
+io.fileman.adapter.ViewAdapter

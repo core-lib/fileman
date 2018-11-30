@@ -16,7 +16,7 @@ import java.util.Date;
 public class TimeAdapter extends Adapter {
 
     @Override
-    public String name() {
+    public String column() {
         return "Time";
     }
 

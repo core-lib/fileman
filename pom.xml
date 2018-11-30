@@ -60,11 +60,11 @@
             <version>1.4.4.RELEASE</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.github.core-lib</groupId>
-            <artifactId>detector</artifactId>
-            <version>v1.1.1</version>
-        </dependency>
+        <!--<dependency>-->
+        <!--<groupId>com.github.core-lib</groupId>-->
+        <!--<artifactId>detector</artifactId>-->
+        <!--<version>v1.1.1</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>

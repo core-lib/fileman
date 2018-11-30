@@ -19,9 +19,9 @@ public class RenderSynthesizer implements Synthesizer<Renderer> {
         Map<String, Object> properties = new LinkedHashMap<String, Object>();
         List<Renderer> renderers = context.getConverters();
         for (Renderer renderer : renderers) {
-            String name = renderer.name();
+            String column = renderer.column();
             Object value = renderer.render(file, new RenderContext(context));
-            properties.put(name, value);
+            properties.put(column, value);
         }
         return properties;
     }

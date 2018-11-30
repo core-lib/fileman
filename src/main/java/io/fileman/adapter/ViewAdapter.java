@@ -16,7 +16,7 @@ import java.io.File;
 public class ViewAdapter extends Adapter {
 
     @Override
-    public String name() {
+    public String column() {
         return "View";
     }
 

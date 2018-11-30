@@ -11,6 +11,13 @@ import java.io.File;
 public interface Interceptor extends Plugin {
 
     /**
+     * SPI 实现名称，用于和配置的值对应。
+     *
+     * @return SPI 实现名称
+     */
+    String name();
+
+    /**
      * 拦截
      *
      * @param file    当前访问文件

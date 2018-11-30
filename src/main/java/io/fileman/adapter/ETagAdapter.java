@@ -14,7 +14,7 @@ import java.io.File;
 public class ETagAdapter extends Adapter {
 
     @Override
-    public String name() {
+    public String column() {
         return "ETag";
     }
 

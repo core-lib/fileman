@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 public class TypeAdapter extends Adapter {
 
     @Override
-    public String name() {
+    public String column() {
         return "Type";
     }
 

@@ -14,7 +14,7 @@ import java.io.File;
 public class SizeAdapter extends Adapter {
 
     @Override
-    public String name() {
+    public String column() {
         return "Size";
     }
 

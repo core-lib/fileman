@@ -1,9 +1,5 @@
 package io.fileman;
 
-import io.detector.Filter;
-import io.detector.FilterChain;
-import io.detector.Resource;
-import io.detector.SimpleDetector;
 import io.fileman.formatter.HtmlFormatter;
 
 import javax.servlet.ServletException;
@@ -36,70 +32,52 @@ public class FilemanWebSupport implements Interceptor {
     protected List<Interceptor> interceptors = new ArrayList<>();
 
     protected void init(Configuration configuration) throws ServletException {
-        try {
-            this.configuration = configuration;
-            root = Toolkit.ifBlank(configuration.valueOf("root"), System.getProperty("user.dir"));
-            synthesizer = Toolkit.newInstance(Toolkit.ifBlank(configuration.valueOf("synthesizer"), RenderSynthesizer.class.getName()));
-            formatter = Toolkit.newInstance(Toolkit.ifBlank(configuration.valueOf("formatter"), HtmlFormatter.class.getName()));
-            buffer = Integer.valueOf(Toolkit.ifBlank(configuration.valueOf("buffer"), "" + 1024 * 8));
-            initConverters(configuration);
-            initExtractors(configuration);
-            initInterceptors(configuration);
-        } catch (IOException e) {
-            throw new ServletException(e);
-        }
+        this.configuration = configuration;
+        root = Toolkit.ifBlank(configuration.valueOf("root"), System.getProperty("user.dir"));
+        synthesizer = Toolkit.newInstance(Toolkit.ifBlank(configuration.valueOf("synthesizer"), RenderSynthesizer.class.getName()));
+        formatter = Toolkit.newInstance(Toolkit.ifBlank(configuration.valueOf("formatter"), HtmlFormatter.class.getName()));
+        buffer = Integer.valueOf(Toolkit.ifBlank(configuration.valueOf("buffer"), "" + 1024 * 8));
+        initConverters(configuration);
+        initExtractors(configuration);
+        initInterceptors(configuration);
     }
 
-    private void initConverters(Configuration configuration) throws IOException, ServletException {
+    private void initConverters(Configuration configuration) throws ServletException {
         converters.clear();
-        Collection<Resource> resources = SimpleDetector.Builder
-                .scan("fileman")
-                .includeJar()
-                .recursively()
-                .build()
-                .detect(new ConverterConfigFilter());
-        Properties properties = new Properties();
-        for (Resource resource : resources) {
-            InputStream in = resource.getInputStream();
-            properties.load(in);
+        Map<String, Converter> map = new LinkedHashMap<>();
+        for (Converter converter : ServiceLoader.load(Converter.class)) {
+            map.put(converter.name(), converter);
         }
-        String fields = configuration.valueOf("fields");
-        Iterable<String> columns = Toolkit.isBlank(fields) ? properties.stringPropertyNames() : Arrays.asList(fields.split(SPLIT_DELIMIT_REGEX));
-        for (String column : columns) {
-            String className = properties.getProperty(column);
-            if (className == null) className = column;
+        for (Resolver resolver : ServiceLoader.load(Resolver.class)) {
+            map.put(resolver.name(), resolver);
+        }
+        for (Renderer renderer : ServiceLoader.load(Renderer.class)) {
+            map.put(renderer.name(), renderer);
+        }
+        String value = configuration.valueOf("fields");
+        Iterable<String> names = Toolkit.isBlank(value) ? map.keySet() : Arrays.asList(value.split(SPLIT_DELIMIT_REGEX));
+        for (String name : names) {
             try {
-                Class<? extends Converter> clazz = Class.forName(className).asSubclass(Converter.class);
-                Converter converter = clazz.newInstance();
+                Converter converter = map.get(name);
                 if (converter instanceof Initialable) ((Initialable) converter).initialize(configuration);
                 converters.add(converter);
             } catch (Exception e) {
-                throw new ServletException("unknown field " + column);
+                throw new ServletException(e);
             }
         }
     }
 
-    private void initExtractors(Configuration configuration) throws IOException, ServletException {
+    private void initExtractors(Configuration configuration) throws ServletException {
         extractors.clear();
-        Collection<Resource> resources = SimpleDetector.Builder
-                .scan("fileman")
-                .includeJar()
-                .recursively()
-                .build()
-                .detect(new ExtractorConfigFilter());
-        Properties properties = new Properties();
-        for (Resource resource : resources) {
-            InputStream in = resource.getInputStream();
-            properties.load(in);
+        Map<String, Extractor> map = new LinkedHashMap<>();
+        for (Extractor extractor : ServiceLoader.load(Extractor.class)) {
+            map.put(extractor.unit(), extractor);
         }
-        String ranges = configuration.valueOf("ranges");
-        Iterable<String> units = Toolkit.isBlank(ranges) ? properties.stringPropertyNames() : Arrays.asList(ranges.split(SPLIT_DELIMIT_REGEX));
-        for (String unit : units) {
+        String value = configuration.valueOf("ranges");
+        Iterable<String> names = Toolkit.isBlank(value) ? map.keySet() : Arrays.asList(value.split(SPLIT_DELIMIT_REGEX));
+        for (String name : names) {
             try {
-                String className = properties.getProperty(unit);
-                if (className == null) className = unit;
-                Class<? extends Extractor> clazz = Class.forName(className).asSubclass(Extractor.class);
-                Extractor extractor = clazz.newInstance();
+                Extractor extractor = map.get(name);
                 if (extractor instanceof Initialable) ((Initialable) extractor).initialize(configuration);
                 extractors.add(extractor);
             } catch (Exception e) {
@@ -108,27 +86,17 @@ public class FilemanWebSupport implements Interceptor {
         }
     }
 
-    private void initInterceptors(Configuration configuration) throws IOException, ServletException {
+    private void initInterceptors(Configuration configuration) throws ServletException {
         interceptors.clear();
-        Collection<Resource> resources = SimpleDetector.Builder
-                .scan("fileman")
-                .includeJar()
-                .recursively()
-                .build()
-                .detect(new InterceptorConfigFilter());
-        Properties properties = new Properties();
-        for (Resource resource : resources) {
-            InputStream in = resource.getInputStream();
-            properties.load(in);
+        Map<String, Interceptor> map = new LinkedHashMap<>();
+        for (Interceptor interceptor : ServiceLoader.load(Interceptor.class)) {
+            map.put(interceptor.name(), interceptor);
         }
         String value = configuration.valueOf("interceptors");
         Iterable<String> names = Toolkit.isBlank(value) ? Collections.<String>emptyList() : Arrays.asList(value.split(SPLIT_DELIMIT_REGEX));
         for (String name : names) {
             try {
-                String className = properties.getProperty(name);
-                if (className == null) className = name;
-                Class<? extends Interceptor> clazz = Class.forName(className).asSubclass(Interceptor.class);
-                Interceptor interceptor = clazz.newInstance();
+                Interceptor interceptor = map.get(name);
                 if (interceptor instanceof Initialable) ((Initialable) interceptor).initialize(configuration);
                 this.interceptors.add(interceptor);
             } catch (Exception e) {
@@ -150,6 +118,11 @@ public class FilemanWebSupport implements Interceptor {
         File file = new File(root, filemanPath);
         InterceptContext context = new InterceptContext(new File(root), configuration, request, response, interceptors.iterator());
         context.doNext(file);
+    }
+
+    @Override
+    public String name() {
+        return "fileman";
     }
 
     @Override
@@ -343,33 +316,4 @@ public class FilemanWebSupport implements Interceptor {
         for (Interceptor interceptor : interceptors) Toolkit.release(interceptor);
     }
 
-    static class ConverterConfigFilter implements Filter {
-        private final List<String> names = Arrays.asList(
-                "fileman/converter.properties",
-                "fileman/resolver.properties",
-                "fileman/renderer.properties",
-                "fileman/adapter.properties"
-        );
-
-        @Override
-        public boolean accept(Resource resource, FilterChain chain) {
-            return names.contains(resource.getName()) && chain.doNext(resource);
-        }
-    }
-
-    static class ExtractorConfigFilter implements Filter {
-
-        @Override
-        public boolean accept(Resource resource, FilterChain chain) {
-            return "fileman/extractor.properties".equals(resource.getName()) && chain.doNext(resource);
-        }
-    }
-
-    static class InterceptorConfigFilter implements Filter {
-
-        @Override
-        public boolean accept(Resource resource, FilterChain chain) {
-            return "fileman/interceptor.properties".equals(resource.getName()) && chain.doNext(resource);
-        }
-    }
 }

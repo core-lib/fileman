@@ -17,6 +17,11 @@ public abstract class Adapter implements Resolver, Renderer {
     }
 
     @Override
+    public String column() {
+        return key();
+    }
+
+    @Override
     public Object render(File file, RenderContext context) throws IOException {
         return resolve(file, new ResolveContext(context));
     }

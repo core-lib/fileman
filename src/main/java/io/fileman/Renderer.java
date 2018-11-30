@@ -14,7 +14,7 @@ public interface Renderer extends Converter {
     /**
      * @return 表格列名
      */
-    String name();
+    String column();
 
     /**
      * 渲染

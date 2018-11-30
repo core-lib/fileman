@@ -1,8 +1,5 @@
 package io.fileman.security;
 
-import io.detector.Filter;
-import io.detector.FilterChain;
-import io.detector.SimpleDetector;
 import io.fileman.*;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -11,10 +8,12 @@ import org.dom4j.io.SAXReader;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ServiceLoader;
 
 /**
  * 安全认证拦截器
@@ -22,7 +21,7 @@ import java.util.*;
  * @author 杨昌沛 646742615@qq.com
  * 2018/9/25
  */
-public class SecurityInterceptor implements Interceptor, Initialable, Filter {
+public class SecurityInterceptor implements Interceptor, Initialable {
     private final SAXReader reader = new SAXReader();
     private final Map<String, Resource> resources = new LinkedHashMap<>();
     private final Map<String, Role> roles = new LinkedHashMap<>();
@@ -64,19 +63,14 @@ public class SecurityInterceptor implements Interceptor, Initialable, Filter {
         }
         {
             String algorithm = configuration.valueOf("security-auth-type", "Basic");
-            Collection<io.detector.Resource> resources = SimpleDetector.Builder
-                    .scan("fileman")
-                    .includeJar()
-                    .recursively()
-                    .build()
-                    .detect(this);
-            Properties properties = new Properties();
-            for (io.detector.Resource resource : resources) {
-                InputStream in = resource.getInputStream();
-                properties.load(in);
+            Map<String, Authenticator> map = new LinkedHashMap<>();
+            for (Authenticator interceptor : ServiceLoader.load(Authenticator.class)) {
+                map.put(interceptor.algorithm(), interceptor);
             }
-            String className = properties.getProperty(algorithm);
-            authenticator = Class.forName(className).asSubclass(Authenticator.class).newInstance();
+            if (!map.containsKey(algorithm)) {
+                throw new Exception("unknown authenticate algorithm " + algorithm);
+            }
+            authenticator = map.get(algorithm);
         }
     }
 
@@ -111,6 +105,11 @@ public class SecurityInterceptor implements Interceptor, Initialable, Filter {
     }
 
     @Override
+    public String name() {
+        return "security";
+    }
+
+    @Override
     public void intercept(File file, InterceptContext context) throws Exception {
         try {
             authenticator.authenticate(file, new AuthenticateContext(context, users));
@@ -125,8 +124,4 @@ public class SecurityInterceptor implements Interceptor, Initialable, Filter {
         }
     }
 
-    @Override
-    public boolean accept(io.detector.Resource resource, FilterChain chain) {
-        return "fileman/authenticator.properties".equals(resource.getName()) && chain.doNext(resource);
-    }
 }

@@ -15,7 +15,7 @@ import java.io.File;
 public class NameAdapter extends Adapter {
 
     @Override
-    public String name() {
+    public String column() {
         return "Name";
     }
 
