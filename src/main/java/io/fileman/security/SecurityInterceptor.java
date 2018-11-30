@@ -8,6 +8,7 @@ import org.dom4j.io.SAXReader;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.LinkedHashMap;
@@ -33,11 +34,14 @@ public class SecurityInterceptor implements Interceptor, Initialable {
         String location = configuration.valueOf("security-config-location");
         if (Toolkit.isBlank(location)) location = "fileman/security.xml";
         String[] locations = location.split(SPLIT_DELIMIT_REGEX);
-        ClassLoader classLoader = this.getClass().getClassLoader();
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        if (classLoader == null) {
+            classLoader = ClassLoader.getSystemClassLoader();
+        }
         for (String config : locations) {
             URL url = classLoader.getResource(config);
             if (url == null) throw new Exception("could not found config " + config);
-            read(url);
+            read(url.openStream());
         }
         for (Role role : roles.values()) {
             Element element = role.getElement();
@@ -74,8 +78,8 @@ public class SecurityInterceptor implements Interceptor, Initialable {
         }
     }
 
-    private void read(URL url) throws DocumentException {
-        Document document = reader.read(url);
+    private void read(InputStream in) throws DocumentException {
+        Document document = reader.read(in);
         Element root = document.getRootElement();
         List<?> elements = root.elements();
         for (Object obj : elements) {
