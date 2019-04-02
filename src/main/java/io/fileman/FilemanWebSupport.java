@@ -201,8 +201,10 @@ public class FilemanWebSupport implements Interceptor {
                 response.setContentType(contentType);
 
                 String name = file.getName();
+                long size = file.length();
                 String contentDisposition = "attachment; filename=\"" + URLEncoder.encode(name, "UTF-8") + "\"";
                 response.setHeader("Content-Disposition", contentDisposition);
+                response.setHeader("Content-Length", String.valueOf(size));
 
                 OutputStream out = response.getOutputStream();
                 InputStream in = null;
@@ -210,7 +212,12 @@ public class FilemanWebSupport implements Interceptor {
                     in = new FileInputStream(file);
                     byte[] buf = new byte[buffer];
                     int len;
-                    while ((len = in.read(buf)) != -1) out.write(buf, 0, len);
+                    long rem = size;
+                    while ((len = in.read(buf, 0, rem > buf.length ? buf.length : (int) rem)) != -1) {
+                        out.write(buf, 0, len);
+                        rem = rem - len;
+                        if (rem <= 0) break;
+                    }
                 } finally {
                     Toolkit.close(in);
                 }
