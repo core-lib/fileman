@@ -203,7 +203,6 @@ public class FilemanWebSupport implements Interceptor {
                 String name = file.getName();
                 String contentDisposition = "attachment; filename=\"" + URLEncoder.encode(name, "UTF-8") + "\"";
                 response.setHeader("Content-Disposition", contentDisposition);
-                response.setHeader("Content-Length", String.valueOf(file.length()));
 
                 OutputStream out = response.getOutputStream();
                 InputStream in = null;
