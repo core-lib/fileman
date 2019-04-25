@@ -1,6 +1,7 @@
 package io.fileman.adapter;
 
 import io.fileman.Adapter;
+import io.fileman.Configuration;
 import io.fileman.RenderContext;
 import io.fileman.ResolveContext;
 
@@ -41,10 +42,12 @@ public class ViewAdapter extends Adapter {
         for (int i = 0; i < length; i++) {
             path.append("../");
         }
-        path.append("fileman.html");
+        Configuration configuration = context.getConfiguration();
+        String mapping = configuration.valueOf("static-resource-mapping", "fileman");
+        path.append(mapping).append("/view.html");
         HttpServletRequest request = context.getRequest();
         String servletPath = request.getServletPath();
-        String hash = "./" + servletPath + "/" + filemanPath;
+        String hash = "../" + servletPath + "/" + filemanPath;
         return (path + "#" + hash).replaceAll("/+", "/");
     }
 }

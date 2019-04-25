@@ -1,4 +1,4 @@
-function Fileman() {
+function View() {
     var loading = false;
     var xhr;
 
@@ -10,7 +10,7 @@ function Fileman() {
         if (!fileURI) return;
         var lines = parseInt((window.innerHeight - 72) / 16);
         if (lines > 0) pageSize = lines;
-        document.title = "Fileman - " + fileURI;
+        document.title = "View - " + fileURI;
         this.load(fileURI, pageNo, pageSize, this.onXHRStateChanged);
     };
 
@@ -98,5 +98,5 @@ function Fileman() {
     };
 }
 
-window.fileman = new Fileman();
+window.fileman = new View();
 fileman.init();
