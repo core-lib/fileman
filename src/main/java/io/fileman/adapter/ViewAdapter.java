@@ -43,7 +43,7 @@ public class ViewAdapter extends Adapter {
             path.append("../");
         }
         Configuration configuration = context.getConfiguration();
-        String mapping = configuration.valueOf("static-resource-mapping", "fileman");
+        String mapping = configuration.valueOf("resource-mapping-location", "fileman");
         path.append(mapping).append("/view.html");
         HttpServletRequest request = context.getRequest();
         String servletPath = request.getServletPath();
