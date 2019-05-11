@@ -1,6 +1,7 @@
 package io.fileman;
 
 import io.fileman.formatter.HtmlFormatter;
+import io.fileman.sorter.PathSorter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -30,6 +31,8 @@ public class FilemanWebSupport implements Interceptor {
     protected List<Converter> converters = new ArrayList<>();
     protected List<Extractor> extractors = new ArrayList<>();
     protected List<Interceptor> interceptors = new ArrayList<>();
+    protected Sorter sorter;
+    protected boolean asc;
 
     protected void init(Configuration configuration) throws ServletException {
         this.configuration = configuration;
@@ -37,6 +40,8 @@ public class FilemanWebSupport implements Interceptor {
         synthesizer = Toolkit.newInstance(Toolkit.ifBlank(configuration.valueOf("synthesizer"), RenderSynthesizer.class.getName()));
         formatter = Toolkit.newInstance(Toolkit.ifBlank(configuration.valueOf("formatter"), HtmlFormatter.class.getName()));
         buffer = Integer.valueOf(Toolkit.ifBlank(configuration.valueOf("buffer"), "" + 1024 * 8));
+        sorter = Toolkit.newInstance(Toolkit.ifBlank(configuration.valueOf("sorter"), PathSorter.class.getName()));
+        asc = Boolean.valueOf(Toolkit.ifBlank(configuration.valueOf("asc"), "true"));
         initConverters(configuration);
         initExtractors(configuration);
         initInterceptors(configuration);
@@ -170,6 +175,10 @@ public class FilemanWebSupport implements Interceptor {
             fileman.setFolder(true);
             fileman.setChildren(new ArrayList<Fileman>());
             File[] files = file.listFiles();
+
+            // 排序
+            sorter.sort(files, asc);
+
             for (int i = 0; files != null && i < files.length; i++) {
                 File sub = files[i];
                 Fileman child = new Fileman();
@@ -181,6 +190,7 @@ public class FilemanWebSupport implements Interceptor {
                 child.setProperties(properties);
                 fileman.getChildren().add(child);
             }
+
             SynthesizeContext<Converter> context = new SynthesizeContext<>(root, configuration, request, response, converters);
             Map<String, Object> properties = synthesizer.synthesize(file, context);
             fileman.setProperties(properties);
