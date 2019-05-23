@@ -177,7 +177,7 @@ public class FilemanWebSupport implements Interceptor {
             File[] files = file.listFiles();
 
             // 排序
-            sorter.sort(files, asc);
+            if (files != null) sorter.sort(files, asc);
 
             for (int i = 0; files != null && i < files.length; i++) {
                 File sub = files[i];
