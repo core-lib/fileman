@@ -2,6 +2,8 @@ package io.fileman;
 
 import javax.servlet.ServletConfig;
 import java.util.Enumeration;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Servlet配置
@@ -11,6 +13,7 @@ import java.util.Enumeration;
  */
 public class FilemanServletConfiguration implements Configuration {
     private final ServletConfig servletConfig;
+    private final Pattern pattern = Pattern.compile("\\$\\{(?<key>.*?)}");
 
     FilemanServletConfiguration(ServletConfig servletConfig) {
         this.servletConfig = servletConfig;
@@ -23,7 +26,18 @@ public class FilemanServletConfiguration implements Configuration {
 
     @Override
     public String valueOf(String name) {
-        return servletConfig.getInitParameter(name);
+        String value = servletConfig.getInitParameter(name);
+        if (value == null) {
+            return null;
+        }
+        Matcher matcher = pattern.matcher(value);
+        while (matcher.find()) {
+            String placeholder = matcher.group();
+            String key = matcher.group("key").trim();
+            String val = System.getProperty(key, System.getenv(key));
+            value = value.replace(placeholder, String.valueOf(val));
+        }
+        return value;
     }
 
     @Override
